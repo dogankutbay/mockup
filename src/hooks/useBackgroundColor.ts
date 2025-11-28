@@ -11,7 +11,7 @@ interface UseBackgroundColorOptions {
   initialColor?: string;
 }
 
-export const useBackgroundColor = ({ scene, initialColor = '#FFFFFF' }: UseBackgroundColorOptions) => {
+export const useBackgroundColor = ({ scene, initialColor = '#FAFAFA' }: UseBackgroundColorOptions) => {
   const [backgroundColor, setBackgroundColor] = useState(initialColor);
 
   useEffect(() => {

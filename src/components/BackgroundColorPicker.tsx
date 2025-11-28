@@ -12,7 +12,7 @@ interface BackgroundColorPickerProps {
 }
 
 const PRESET_COLORS = [
-  { name: 'White', value: '#FFFFFF' },
+  { name: 'White', value: '#FAFAFA' },
   { name: 'Light Gray', value: '#F8F8F8' },
   { name: 'Dark', value: '#0F0F10' },
 ];
