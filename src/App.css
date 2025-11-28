@@ -1179,11 +1179,7 @@
   z-index: 50;
   animation: fadeInFrame 0.3s ease;
   transition: width 0.2s ease, height 0.2s ease;
-}
-
-.video-frame-indicator.dragging {
-  transition: none;
-  user-select: none;
+  pointer-events: none; /* Allow mouse events to pass through to canvas */
 }
 
 .video-frame-indicator::before {
