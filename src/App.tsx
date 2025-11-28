@@ -3,7 +3,8 @@
  * A tool for creating phone mockups with custom screenshots
  */
 
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
+import * as THREE from 'three';
 import { PhoneViewer } from './components/PhoneViewer';
 import { ControlPanel } from './components/ControlPanel';
 import { LoadingState } from './components/LoadingState';
@@ -44,6 +45,9 @@ function App() {
   const [mode, setMode] = useState<AppMode>('picture');
   const [frameZoom, setFrameZoom] = useState(0.7); // Default 70% of max viewport size
   const [frameAspectRatio, setFrameAspectRatio] = useState<FrameAspectRatio>('square');
+  type CameraState = { position: THREE.Vector3; target: THREE.Vector3 };
+  const pictureCameraStateRef = useRef<CameraState | null>(null);
+  const videoCameraStateRef = useRef<CameraState | null>(null);
 
   // Initialize Three.js scene
   const { sceneObjects, setControlsForVideoMode } = useThreeScene(mountRef);
@@ -109,7 +113,7 @@ function App() {
     camera: sceneObjects?.camera || null,
     controls: sceneObjects?.controls || null,
     modelConfig: selectedModel,
-    enabled: mode === 'picture', // Only animate in picture mode
+    enabled: mode === 'picture' && !pictureCameraStateRef.current, // Only run when no saved state
   });
 
   // Video animation controls
@@ -130,13 +134,66 @@ function App() {
   });
 
   // Auto-fit phone to video frame when entering video mode (only if no keyframes)
+  const shouldAutoFitVideo = mode === 'video' && !videoCameraStateRef.current && keyframes.length === 0;
   useVideoFrameFitting({
     phoneModel,
     camera: sceneObjects?.camera || null,
     controls: sceneObjects?.controls || null,
     mode,
-    hasKeyframes: keyframes.length > 0,
+    shouldAutoFit: shouldAutoFitVideo,
   });
+
+  const applyCameraState = (state: CameraState) => {
+    if (!sceneObjects?.camera || !sceneObjects?.controls) return;
+    sceneObjects.controls.target.copy(state.target);
+    sceneObjects.camera.position.copy(state.position);
+    sceneObjects.controls.update();
+  };
+
+  // Track latest camera state based on mode
+  useEffect(() => {
+    if (!sceneObjects?.camera || !sceneObjects?.controls) return;
+    const controls = sceneObjects.controls;
+    const updateState = () => {
+      const snapshot: CameraState = {
+        position: sceneObjects.camera.position.clone(),
+        target: sceneObjects.controls.target.clone(),
+      };
+      if (mode === 'picture') {
+        pictureCameraStateRef.current = snapshot;
+      } else {
+        videoCameraStateRef.current = snapshot;
+      }
+    };
+    controls.addEventListener('change', updateState);
+    updateState();
+    return () => controls.removeEventListener('change', updateState);
+  }, [sceneObjects, mode]);
+
+  const handleModeChange = (nextMode: AppMode) => {
+    if (nextMode === mode) return;
+
+    if (sceneObjects?.camera && sceneObjects?.controls) {
+      const snapshot: CameraState = {
+        position: sceneObjects.camera.position.clone(),
+        target: sceneObjects.controls.target.clone(),
+      };
+      if (mode === 'picture') {
+        pictureCameraStateRef.current = snapshot;
+      } else {
+        videoCameraStateRef.current = snapshot;
+      }
+    }
+
+    setMode(nextMode);
+
+    const targetState =
+      nextMode === 'picture' ? pictureCameraStateRef.current : videoCameraStateRef.current;
+
+    if (targetState) {
+      requestAnimationFrame(() => applyCameraState(targetState));
+    }
+  };
 
   // Reset camera to flat/centered position (0, 0, z)
   const handleResetCamera = () => {
@@ -192,7 +249,7 @@ function App() {
   };
 
   return (
-    <div className="app">
+    <div className={`app ${mode === 'video' ? 'video-mode' : ''}`}>
       <ErrorMessage error={error} onDismiss={handleDismissError} />
       
       <aside className={`sidebar ${sidebarCollapsed ? 'collapsed' : ''}`}>
@@ -290,7 +347,7 @@ function App() {
           </>
         )}
         
-        <ModeToggle mode={mode} onModeChange={setMode} />
+        <ModeToggle mode={mode} onModeChange={handleModeChange} />
         
         {mode === 'video' && (
           <div className="video-bottom-bar">

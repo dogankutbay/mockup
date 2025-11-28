@@ -54,6 +54,11 @@ export const useVideoAnimation = ({ camera, controls, mode }: UseVideoAnimationO
         y: kf1.cameraRotation.y + (kf2.cameraRotation.y - kf1.cameraRotation.y) * easedT,
         z: kf1.cameraRotation.z + (kf2.cameraRotation.z - kf1.cameraRotation.z) * easedT,
       },
+      controlsTarget: {
+        x: kf1.controlsTarget.x + (kf2.controlsTarget.x - kf1.controlsTarget.x) * easedT,
+        y: kf1.controlsTarget.y + (kf2.controlsTarget.y - kf1.controlsTarget.y) * easedT,
+        z: kf1.controlsTarget.z + (kf2.controlsTarget.z - kf1.controlsTarget.z) * easedT,
+      },
     };
   }, []);
 
@@ -87,7 +92,11 @@ export const useVideoAnimation = ({ camera, controls, mode }: UseVideoAnimationO
 
     isApplyingStateRef.current = true; // Mark as programmatic change
 
-    isApplyingStateRef.current = true;
+    controls.target.set(
+      state.controlsTarget.x,
+      state.controlsTarget.y,
+      state.controlsTarget.z
+    );
 
     camera.position.set(
       state.cameraPosition.x,
@@ -159,6 +168,11 @@ export const useVideoAnimation = ({ camera, controls, mode }: UseVideoAnimationO
         x: 0, // We'll calculate from controls if needed
         y: 0,
         z: 0,
+      },
+      controlsTarget: {
+        x: controls.target.x,
+        y: controls.target.y,
+        z: controls.target.z,
       },
     };
 

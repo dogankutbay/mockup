@@ -10,6 +10,7 @@ export interface Keyframe {
   time: number; // 0-10 seconds
   cameraPosition: { x: number; y: number; z: number };
   cameraRotation: { x: number; y: number; z: number };
+  controlsTarget: { x: number; y: number; z: number };
 }
 
 interface VideoTimelineProps {
@@ -153,7 +154,7 @@ export const VideoTimeline: React.FC<VideoTimelineProps> = ({
               <div
                 key={index}
                 className="keyframe-marker"
-                style={{ left: `${(keyframe.time / duration) * 100}%` }}
+                style={{ left: `calc(1.2% + ${(keyframe.time / duration) * 97.6}%)` }}
                 title={`Keyframe at ${formatTime(keyframe.time)}`}
               />
             ))}
