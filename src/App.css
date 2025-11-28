@@ -1226,6 +1226,7 @@ body {
 
 /* Transparent background checkbox */
 .transparent-checkbox {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -1249,6 +1250,33 @@ body {
 
 .transparent-checkbox:hover span {
   opacity: 1;
+}
+
+/* Custom tooltip for transparent checkbox - appears above */
+.transparent-checkbox::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 0.5rem 0.75rem;
+  background: hsl(var(--primary));
+  color: hsl(var(--primary-foreground));
+  border-radius: var(--radius);
+  font-size: 0.875rem;
+  font-weight: 500;
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.15s ease, visibility 0.15s ease;
+  pointer-events: none;
+  z-index: 1000;
+  margin-bottom: 8px;
+}
+
+.transparent-checkbox:hover::after {
+  opacity: 1;
+  visibility: visible;
 }
 
 /* Video Frame Indicator - Shows export area */

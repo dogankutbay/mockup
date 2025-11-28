@@ -161,13 +161,13 @@ export const VideoTimeline: React.FC<VideoTimelineProps> = ({
             className="timeline-slider"
           />
           
-          {/* Keyframe markers */}
+          {/* Keyframe markers - aligned with slider thumb (9px = half of 18px thumb) */}
           <div className="keyframe-markers">
             {keyframes.map((keyframe, index) => (
               <div
                 key={index}
                 className="keyframe-marker"
-                style={{ left: `calc(1.5% + ${(keyframe.time / duration) * 97.6}%)` }}
+                style={{ left: `calc(9px + (100% - 18px) * ${keyframe.time / duration})` }}
                 title={`Keyframe at ${formatTime(keyframe.time)}`}
                 onClick={() => onTimeChange(keyframe.time)}
               />
@@ -197,7 +197,10 @@ export const VideoTimeline: React.FC<VideoTimelineProps> = ({
             'Render & Export'
           )}
         </button>
-        <label className="transparent-checkbox">
+        <label 
+          className="transparent-checkbox"
+          data-tooltip="During rendering background will turn black, it's fine"
+        >
           <input
             type="checkbox"
             checked={transparentBackground}
