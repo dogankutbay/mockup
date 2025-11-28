@@ -895,6 +895,12 @@
   left: 50%;
   transform: translateX(-50%);
   z-index: 200;
+  transition: bottom 0.3s ease;
+}
+
+/* Move higher when video mode is active to avoid timeline bar */
+.app-main.video-mode .mode-toggle-wrapper {
+  bottom: 150px; /* Above the timeline bar (120px height + 30px gap) */
 }
 
 .mode-toggle {
