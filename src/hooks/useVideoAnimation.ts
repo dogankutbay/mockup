@@ -144,8 +144,25 @@ export const useVideoAnimation = ({ camera, controls, mode }: UseVideoAnimationO
       },
     };
 
+    console.log('🎬 Keyframe added:', {
+      time: currentTime.toFixed(2) + 's',
+      position: {
+        x: camera.position.x.toFixed(2),
+        y: camera.position.y.toFixed(2),
+        z: camera.position.z.toFixed(2),
+      }
+    });
+
     setKeyframes(prev => [...prev, newKeyframe].sort((a, b) => a.time - b.time));
   }, [camera, controls, currentTime]);
+
+  // Reset all keyframes and animation state
+  const handleResetAll = useCallback(() => {
+    setKeyframes([]);
+    setCurrentTime(0);
+    setIsPlaying(false);
+    console.log('🔄 Animation reset - all keyframes cleared');
+  }, []);
 
   const handlePlayPause = () => {
     setIsPlaying(!isPlaying);
@@ -178,6 +195,7 @@ export const useVideoAnimation = ({ camera, controls, mode }: UseVideoAnimationO
     handleTimeChange,
     handleDurationChange,
     addKeyframe,
+    handleResetAll,
   };
 };
 

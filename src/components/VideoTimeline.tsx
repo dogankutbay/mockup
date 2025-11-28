@@ -4,7 +4,7 @@
  */
 
 import React, { useState } from 'react';
-import { FaPlay, FaPause, FaPlus, FaDownload } from 'react-icons/fa';
+import { FaPlay, FaPause, FaPlus, FaDownload, FaUndo } from 'react-icons/fa';
 
 export interface Keyframe {
   time: number; // 0-10 seconds
@@ -22,6 +22,7 @@ interface VideoTimelineProps {
   onDurationChange: (duration: number) => void;
   onPlayPause: () => void;
   onAddKeyframe: () => void;
+  onResetAll: () => void;
   onExport: () => void;
   disabled?: boolean;
 }
@@ -36,6 +37,7 @@ export const VideoTimeline: React.FC<VideoTimelineProps> = ({
   onDurationChange,
   onPlayPause,
   onAddKeyframe,
+  onResetAll,
   onExport,
   disabled = false,
 }) => {
@@ -93,6 +95,16 @@ export const VideoTimeline: React.FC<VideoTimelineProps> = ({
           aria-label="Add keyframe"
         >
           <FaPlus /> Keyframe
+        </button>
+        
+        <button
+          className="video-control-btn"
+          onClick={onResetAll}
+          disabled={disabled || isRecording || keyframes.length === 0}
+          aria-label="Reset all keyframes"
+          title="Reset all keyframes"
+        >
+          <FaUndo /> Reset All
         </button>
         
         <div className="video-timeline-info">

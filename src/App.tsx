@@ -122,6 +122,7 @@ function App() {
     handleTimeChange,
     handleDurationChange,
     addKeyframe,
+    handleResetAll,
   } = useVideoAnimation({
     camera: sceneObjects?.camera || null,
     controls: sceneObjects?.controls || null,
@@ -302,6 +303,7 @@ function App() {
               onDurationChange={handleDurationChange}
               onPlayPause={handlePlayPause}
               onAddKeyframe={addKeyframe}
+              onResetAll={handleResetAll}
               onExport={() => {
                 setError({ message: 'Video export coming soon!', type: 'export' });
               }}
