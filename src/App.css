@@ -28,11 +28,6 @@
   transform: translateX(-100%);
 }
 
-.sidebar.hidden {
-  transform: translateX(-100%);
-  pointer-events: none;
-}
-
 /* Sidebar Toggle Button */
 .sidebar-toggle {
   position: absolute;
@@ -213,10 +208,6 @@
 }
 
 .app-main.sidebar-collapsed {
-  margin-left: 0;
-}
-
-.app-main.video-mode {
   margin-left: 0;
 }
 

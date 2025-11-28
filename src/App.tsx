@@ -189,7 +189,7 @@ function App() {
     <div className="app">
       <ErrorMessage error={error} onDismiss={handleDismissError} />
       
-      <aside className={`sidebar ${sidebarCollapsed ? 'collapsed' : ''} ${mode === 'video' ? 'hidden' : ''}`}>
+      <aside className={`sidebar ${sidebarCollapsed ? 'collapsed' : ''}`}>
         <button 
           className="sidebar-toggle"
           onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
