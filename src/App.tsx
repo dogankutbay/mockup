@@ -48,6 +48,7 @@ function App() {
   type CameraState = { position: THREE.Vector3; target: THREE.Vector3 };
   const pictureCameraStateRef = useRef<CameraState | null>(null);
   const videoCameraStateRef = useRef<CameraState | null>(null);
+  const lastModelIdRef = useRef<string>(selectedModel.id);
 
   // Initialize Three.js scene
   const { sceneObjects, setControlsForVideoMode } = useThreeScene(mountRef);
@@ -108,12 +109,22 @@ function App() {
     initialColor: '#FAFAFA',
   });
 
+  // Reset saved camera states when phone model changes
+  useEffect(() => {
+    if (selectedModel.id !== lastModelIdRef.current) {
+      pictureCameraStateRef.current = null;
+      videoCameraStateRef.current = null;
+      lastModelIdRef.current = selectedModel.id;
+    }
+  }, [selectedModel.id]);
+
   // Adjust camera position based on selected model (Picture mode only)
+  // Re-run when model changes (pictureCameraStateRef gets cleared above)
   useCameraPosition({
     camera: sceneObjects?.camera || null,
     controls: sceneObjects?.controls || null,
     modelConfig: selectedModel,
-    enabled: mode === 'picture' && !pictureCameraStateRef.current, // Only run when no saved state
+    enabled: mode === 'picture' && !pictureCameraStateRef.current,
   });
 
   // Video animation controls
