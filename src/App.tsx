@@ -75,7 +75,7 @@ function App() {
   // Handle background color
   const { backgroundColor, setBackgroundColor } = useBackgroundColor({
     scene: sceneObjects?.scene || null,
-    initialColor: '#FFFFFF',
+    initialColor: '#FAFAFA',
   });
 
   // Adjust camera position based on selected model
