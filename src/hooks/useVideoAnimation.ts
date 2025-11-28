@@ -89,6 +89,15 @@ export const useVideoAnimation = ({ camera, controls, mode }: UseVideoAnimationO
       state.cameraPosition.z
     );
 
+    console.log('🎥 Applying camera state:', {
+      time: state.time.toFixed(2) + 's',
+      position: {
+        x: state.cameraPosition.x.toFixed(2),
+        y: state.cameraPosition.y.toFixed(2),
+        z: state.cameraPosition.z.toFixed(2),
+      }
+    });
+
     // Note: We're using OrbitControls, so rotation is handled differently
     // We'll need to set the target instead
     controls.update();
@@ -153,7 +162,14 @@ export const useVideoAnimation = ({ camera, controls, mode }: UseVideoAnimationO
       }
     });
 
-    setKeyframes(prev => [...prev, newKeyframe].sort((a, b) => a.time - b.time));
+    setKeyframes(prev => {
+      const updated = [...prev, newKeyframe].sort((a, b) => a.time - b.time);
+      console.log('📋 All keyframes:', updated.map(kf => ({
+        time: kf.time.toFixed(2) + 's',
+        y: kf.cameraPosition.y.toFixed(2)
+      })));
+      return updated;
+    });
   }, [camera, controls, currentTime]);
 
   // Reset all keyframes and animation state
