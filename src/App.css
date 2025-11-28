@@ -1211,13 +1211,13 @@
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: min(90vh, 90vw); /* Square frame that fits the screen */
-  height: min(90vh, 90vw);
+  aspect-ratio: 1; /* Keep it square */
   border: 3px dashed hsl(var(--primary) / 0.4);
   border-radius: 12px;
   pointer-events: none;
   z-index: 50;
   animation: fadeInFrame 0.3s ease;
+  transition: width 0.2s ease, height 0.2s ease;
 }
 
 .video-frame-indicator::before {
@@ -1245,6 +1245,69 @@
     opacity: 1;
     transform: translate(-50%, -50%) scale(1);
   }
+}
+
+/* Frame Zoom Controls */
+.frame-zoom-controls {
+  position: fixed;
+  top: 2rem;
+  right: 2rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: hsl(var(--background));
+  border: 1px solid hsl(var(--border));
+  border-radius: var(--radius);
+  padding: 0.5rem;
+  box-shadow: 0 4px 12px rgb(0 0 0 / 0.1);
+  z-index: 200;
+  animation: fadeInFrame 0.3s ease;
+}
+
+.frame-zoom-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 2.5rem;
+  height: 2.5rem;
+  padding: 0;
+  font-size: 0.875rem;
+  font-weight: 500;
+  border: 1px solid hsl(var(--border));
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  background: hsl(var(--background));
+  color: hsl(var(--foreground));
+}
+
+.frame-zoom-btn:hover:not(:disabled) {
+  background: hsl(var(--accent));
+  border-color: hsl(var(--primary) / 0.5);
+}
+
+.frame-zoom-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.frame-zoom-btn svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+.frame-zoom-reset {
+  width: auto;
+  padding: 0 0.75rem;
+  min-width: 4.5rem;
+}
+
+.frame-zoom-percentage {
+  font-family: monospace;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: hsl(var(--primary));
 }
 
 /* Responsive Design */

@@ -16,6 +16,7 @@ import { CameraSliders } from './components/CameraSliders';
 import { ScreenshotGallery } from './components/ScreenshotGallery';
 import { ModeToggle } from './components/ModeToggle';
 import { VideoTimeline } from './components/VideoTimeline';
+import { FrameZoomControls } from './components/FrameZoomControls';
 import type { AppMode } from './components/ModeToggle';
 import { FaLightbulb, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 import { useThreeScene } from './hooks/useThreeScene';
@@ -37,6 +38,7 @@ function App() {
   const [cameraPos, setCameraPos] = useState({ x: 0, y: 0, z: 10 });
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mode, setMode] = useState<AppMode>('picture');
+  const [frameZoom, setFrameZoom] = useState(0.7); // Default 70% of max viewport size
 
   // Initialize Three.js scene
   const { sceneObjects, setControlsForVideoMode } = useThreeScene(mountRef);
@@ -252,7 +254,26 @@ function App() {
         <PhoneViewer mountRef={mountRef} />
         
         {/* Square frame indicator in video mode */}
-        {mode === 'video' && <div className="video-frame-indicator" />}
+        {mode === 'video' && (
+          <>
+            <div 
+              className="video-frame-indicator" 
+              style={{ 
+                width: `${frameZoom * 100}%`,
+                height: `${frameZoom * 100}%`,
+                maxWidth: `min(${frameZoom * 90}vh, ${frameZoom * 90}vw)`,
+                maxHeight: `min(${frameZoom * 90}vh, ${frameZoom * 90}vw)`,
+              }} 
+            />
+            <FrameZoomControls
+              zoom={frameZoom}
+              onZoomIn={() => setFrameZoom(Math.min(1.5, frameZoom + 0.1))}
+              onZoomOut={() => setFrameZoom(Math.max(0.3, frameZoom - 0.1))}
+              onReset={() => setFrameZoom(0.7)}
+              disabled={false}
+            />
+          </>
+        )}
         
         <ModeToggle mode={mode} onModeChange={setMode} />
         

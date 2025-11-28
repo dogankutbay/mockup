@@ -15,6 +15,7 @@ export { CameraSliders } from './CameraSliders';
 export { ScreenshotGallery } from './ScreenshotGallery';
 export { ModeToggle } from './ModeToggle';
 export { VideoTimeline } from './VideoTimeline';
+export { FrameZoomControls } from './FrameZoomControls';
 export type { AppMode } from './ModeToggle';
 export type { Keyframe } from './VideoTimeline';
 
