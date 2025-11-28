@@ -210,40 +210,67 @@ export const useVideoAnimation = ({ camera, controls, mode }: UseVideoAnimationO
     addOrUpdateKeyframe(false);
   }, [addOrUpdateKeyframe]);
 
-  // Auto-add keyframe when camera moves (manual user movement ONLY)
+  // DISABLED: Auto-add keyframe (causing too many false triggers)
+  // Users will use the manual "Add Keyframe" button instead
+  // This is more predictable and gives better control
+  
+  // Track user interaction instead of 'change' events
   useEffect(() => {
-    if (!camera || !controls || mode !== 'video' || isPlaying) return;
+    if (!camera || !controls || mode !== 'video') return;
 
-    const handleCameraChange = () => {
-      // Ignore if this is a programmatic change (from playback/scrubbing)
-      if (isApplyingStateRef.current) return;
+    let isUserInteracting = false;
+    let interactionTimeout: NodeJS.Timeout;
 
-      const current = {
-        x: camera.position.x,
-        y: camera.position.y,
-        z: camera.position.z,
-      };
-
-      // Check if camera actually moved (threshold to avoid noise)
-      if (lastCameraPositionRef.current) {
-        const dx = Math.abs(current.x - lastCameraPositionRef.current.x);
-        const dy = Math.abs(current.y - lastCameraPositionRef.current.y);
-        const dz = Math.abs(current.z - lastCameraPositionRef.current.z);
-        
-        if (dx > 0.01 || dy > 0.01 || dz > 0.01) {
-          // Camera moved significantly by USER, auto-add/update keyframe
-          addOrUpdateKeyframe(true);
-        }
-      } else {
-        // First movement, store initial position
-        lastCameraPositionRef.current = current;
+    const handleInteractionStart = () => {
+      isUserInteracting = true;
+      if (lastCameraPositionRef.current === null) {
+        lastCameraPositionRef.current = {
+          x: camera.position.x,
+          y: camera.position.y,
+          z: camera.position.z,
+        };
       }
     };
 
-    controls.addEventListener('change', handleCameraChange);
+    const handleInteractionEnd = () => {
+      // Wait a bit after interaction ends to capture final position
+      clearTimeout(interactionTimeout);
+      interactionTimeout = setTimeout(() => {
+        if (isUserInteracting && !isPlaying) {
+          const current = {
+            x: camera.position.x,
+            y: camera.position.y,
+            z: camera.position.z,
+          };
+
+          if (lastCameraPositionRef.current) {
+            const dx = Math.abs(current.x - lastCameraPositionRef.current.x);
+            const dy = Math.abs(current.y - lastCameraPositionRef.current.y);
+            const dz = Math.abs(current.z - lastCameraPositionRef.current.z);
+            
+            if (dx > 0.1 || dy > 0.1 || dz > 0.1) {
+              // Significant movement detected, auto-add keyframe
+              addOrUpdateKeyframe(true);
+            }
+          }
+        }
+        isUserInteracting = false;
+      }, 100);
+    };
+
+    // Listen to mousedown/mouseup on the canvas
+    const canvas = controls.domElement;
+    canvas.addEventListener('mousedown', handleInteractionStart);
+    canvas.addEventListener('mouseup', handleInteractionEnd);
+    canvas.addEventListener('wheel', handleInteractionStart); // For zoom
+    canvas.addEventListener('wheel', handleInteractionEnd);
 
     return () => {
-      controls.removeEventListener('change', handleCameraChange);
+      canvas.removeEventListener('mousedown', handleInteractionStart);
+      canvas.removeEventListener('mouseup', handleInteractionEnd);
+      canvas.removeEventListener('wheel', handleInteractionStart);
+      canvas.removeEventListener('wheel', handleInteractionEnd);
+      clearTimeout(interactionTimeout);
     };
   }, [camera, controls, mode, isPlaying, addOrUpdateKeyframe]);
 
