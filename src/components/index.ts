@@ -12,4 +12,5 @@ export { PhoneModelSelector } from './PhoneModelSelector';
 export { ResolutionInfo } from './ResolutionInfo';
 export { CameraControls } from './CameraControls';
 export { CameraSliders } from './CameraSliders';
+export { ScreenshotGallery } from './ScreenshotGallery';
 

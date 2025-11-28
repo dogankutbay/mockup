@@ -13,6 +13,7 @@ import { PhoneModelSelector } from './components/PhoneModelSelector';
 import { ResolutionInfo } from './components/ResolutionInfo';
 import { CameraControls } from './components/CameraControls';
 import { CameraSliders } from './components/CameraSliders';
+import { ScreenshotGallery } from './components/ScreenshotGallery';
 import { FaLightbulb, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 import { useThreeScene } from './hooks/useThreeScene';
 import { usePhoneModel } from './hooks/usePhoneModel';
@@ -66,7 +67,13 @@ function App() {
   });
 
   // Handle screenshot upload and application
-  const { handleScreenshotUpload } = useScreenshot({
+  const { 
+    screenshots,
+    activeIndex,
+    handleScreenshotUpload,
+    clearAllScreenshots,
+    setActiveScreenshot,
+  } = useScreenshot({
     phoneModel,
     modelConfig: selectedModel,
     onError: setError,
@@ -175,7 +182,15 @@ function App() {
             onExport={handleExport}
             disabled={isLoading}
           />
-          
+
+          <ScreenshotGallery
+            screenshots={screenshots}
+            activeIndex={activeIndex}
+            onSelectScreenshot={setActiveScreenshot}
+            onClearAll={clearAllScreenshots}
+            disabled={isLoading}
+          />
+
           <BackgroundColorPicker
             selectedColor={backgroundColor}
             onColorChange={setBackgroundColor}

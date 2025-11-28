@@ -15,14 +15,17 @@ interface UseScreenshotOptions {
 }
 
 export const useScreenshot = ({ phoneModel, modelConfig, onError }: UseScreenshotOptions) => {
-  const [screenshot, setScreenshot] = useState<ScreenshotData>(null);
+  const [screenshots, setScreenshots] = useState<string[]>([]);
+  const [activeIndex, setActiveIndex] = useState<number>(-1);
 
-  // Apply screenshot to phone when both are available
+  const activeScreenshot = activeIndex >= 0 ? screenshots[activeIndex] : null;
+
+  // Apply active screenshot to phone when available
   useEffect(() => {
-    if (phoneModel && screenshot) {
+    if (phoneModel && activeScreenshot) {
       applyScreenshotToScreen(
         phoneModel, 
-        screenshot, 
+        activeScreenshot, 
         modelConfig.screenMeshName,
         modelConfig.textureTransform,
         (error) => {
@@ -33,7 +36,7 @@ export const useScreenshot = ({ phoneModel, modelConfig, onError }: UseScreensho
         }
       );
     }
-  }, [screenshot, phoneModel, modelConfig.screenMeshName, modelConfig.textureTransform, onError]);
+  }, [activeScreenshot, phoneModel, modelConfig.screenMeshName, modelConfig.textureTransform, onError]);
 
   const handleScreenshotUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -54,7 +57,8 @@ export const useScreenshot = ({ phoneModel, modelConfig, onError }: UseScreensho
     reader.onload = (e) => {
       const result = e.target?.result;
       if (typeof result === 'string') {
-        setScreenshot(result);
+        setScreenshots(prev => [...prev, result]);
+        setActiveIndex(prev => prev + 1);
       }
     };
     reader.onerror = () => {
@@ -64,8 +68,29 @@ export const useScreenshot = ({ phoneModel, modelConfig, onError }: UseScreensho
       });
     };
     reader.readAsDataURL(file);
+    
+    // Reset file input to allow uploading the same file again
+    event.target.value = '';
   };
 
-  return { screenshot, handleScreenshotUpload };
+  const clearAllScreenshots = () => {
+    setScreenshots([]);
+    setActiveIndex(-1);
+  };
+
+  const setActiveScreenshot = (index: number) => {
+    if (index >= 0 && index < screenshots.length) {
+      setActiveIndex(index);
+    }
+  };
+
+  return { 
+    screenshots, 
+    activeIndex,
+    activeScreenshot,
+    handleScreenshotUpload,
+    clearAllScreenshots,
+    setActiveScreenshot,
+  };
 };
 
