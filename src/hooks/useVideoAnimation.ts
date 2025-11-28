@@ -9,7 +9,7 @@ import type { Keyframe } from '../components/VideoTimeline';
 import type { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 
 interface UseVideoAnimationOptions {
-  camera: THREE.Camera | null;
+  camera: THREE.PerspectiveCamera | null;
   controls: OrbitControls | null;
   mode: 'picture' | 'video';
 }
@@ -177,8 +177,17 @@ export const useVideoAnimation = ({ camera, controls, mode }: UseVideoAnimationO
     setKeyframes([]);
     setCurrentTime(0);
     setIsPlaying(false);
-    console.log('🔄 Animation reset - all keyframes cleared');
-  }, []);
+    
+    // Reset camera to default centered position
+    if (camera && controls) {
+      camera.position.set(0, 0, 24.29); // Default Z from auto-fit
+      controls.target.set(0, 0, 0);
+      controls.update();
+      console.log('🔄 Animation reset - keyframes cleared & camera centered');
+    } else {
+      console.log('🔄 Animation reset - all keyframes cleared');
+    }
+  }, [camera, controls]);
 
   const handlePlayPause = () => {
     setIsPlaying(!isPlaying);
