@@ -8,4 +8,5 @@ export { usePhoneModel } from './usePhoneModel';
 export { useScreenshot } from './useScreenshot';
 export { useBackgroundColor } from './useBackgroundColor';
 export { useCameraPosition } from './useCameraPosition';
+export { useVideoAnimation } from './useVideoAnimation';
 

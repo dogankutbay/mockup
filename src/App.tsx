@@ -14,12 +14,16 @@ import { ResolutionInfo } from './components/ResolutionInfo';
 import { CameraControls } from './components/CameraControls';
 import { CameraSliders } from './components/CameraSliders';
 import { ScreenshotGallery } from './components/ScreenshotGallery';
+import { ModeToggle } from './components/ModeToggle';
+import { VideoTimeline } from './components/VideoTimeline';
+import type { AppMode } from './components/ModeToggle';
 import { FaLightbulb, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 import { useThreeScene } from './hooks/useThreeScene';
 import { usePhoneModel } from './hooks/usePhoneModel';
 import { useScreenshot } from './hooks/useScreenshot';
 import { useBackgroundColor } from './hooks/useBackgroundColor';
 import { useCameraPosition } from './hooks/useCameraPosition';
+import { useVideoAnimation } from './hooks/useVideoAnimation';
 import { exportCanvasAsImage } from './utils/exportUtils';
 import { DEFAULT_PHONE_MODEL } from './config/phoneModels';
 import type { AppError } from './types';
@@ -32,6 +36,7 @@ function App() {
   const [selectedModel, setSelectedModel] = useState<PhoneModelConfig>(DEFAULT_PHONE_MODEL);
   const [cameraPos, setCameraPos] = useState({ x: 0, y: 0, z: 10 });
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [mode, setMode] = useState<AppMode>('picture');
 
   // Initialize Three.js scene
   const sceneObjects = useThreeScene(mountRef);
@@ -85,11 +90,28 @@ function App() {
     initialColor: '#FAFAFA',
   });
 
-  // Adjust camera position based on selected model
+  // Adjust camera position based on selected model (Picture mode only)
   useCameraPosition({
     camera: sceneObjects?.camera || null,
     controls: sceneObjects?.controls || null,
     modelConfig: selectedModel,
+    enabled: mode === 'picture', // Only animate in picture mode
+  });
+
+  // Video animation controls
+  const {
+    keyframes,
+    currentTime,
+    duration,
+    isPlaying,
+    handlePlayPause,
+    handleTimeChange,
+    handleDurationChange,
+    addKeyframe,
+  } = useVideoAnimation({
+    camera: sceneObjects?.camera || null,
+    controls: sceneObjects?.controls || null,
+    mode,
   });
 
   // Reset camera to flat/centered position (0, 0, z)
@@ -149,7 +171,7 @@ function App() {
     <div className="app">
       <ErrorMessage error={error} onDismiss={handleDismissError} />
       
-      <aside className={`sidebar ${sidebarCollapsed ? 'collapsed' : ''}`}>
+      <aside className={`sidebar ${sidebarCollapsed ? 'collapsed' : ''} ${mode === 'video' ? 'hidden' : ''}`}>
         <button 
           className="sidebar-toggle"
           onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
@@ -218,9 +240,31 @@ function App() {
         </div>
       </aside>
 
-      <main className={`app-main ${sidebarCollapsed ? 'sidebar-collapsed' : ''}`}>
+      <main className={`app-main ${sidebarCollapsed ? 'sidebar-collapsed' : ''} ${mode === 'video' ? 'video-mode' : ''}`}>
         {isLoading && <LoadingState message="Loading phone model..." />}
         <PhoneViewer mountRef={mountRef} />
+        
+        <ModeToggle mode={mode} onModeChange={setMode} />
+        
+        {mode === 'video' && (
+          <div className="video-bottom-bar">
+            <VideoTimeline
+              currentTime={currentTime}
+              duration={duration}
+              keyframes={keyframes}
+              isPlaying={isPlaying}
+              isRecording={false}
+              onTimeChange={handleTimeChange}
+              onDurationChange={handleDurationChange}
+              onPlayPause={handlePlayPause}
+              onAddKeyframe={addKeyframe}
+              onExport={() => {
+                setError({ message: 'Video export coming soon!', type: 'export' });
+              }}
+              disabled={isLoading}
+            />
+          </div>
+        )}
       </main>
     </div>
   );

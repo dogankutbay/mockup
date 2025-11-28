@@ -13,4 +13,8 @@ export { ResolutionInfo } from './ResolutionInfo';
 export { CameraControls } from './CameraControls';
 export { CameraSliders } from './CameraSliders';
 export { ScreenshotGallery } from './ScreenshotGallery';
+export { ModeToggle } from './ModeToggle';
+export { VideoTimeline } from './VideoTimeline';
+export type { AppMode } from './ModeToggle';
+export type { Keyframe } from './VideoTimeline';
 

@@ -11,13 +11,14 @@ interface UseCameraPositionOptions {
   camera: THREE.PerspectiveCamera | null;
   controls: any; // OrbitControls
   modelConfig: PhoneModelConfig;
+  enabled?: boolean; // Only animate when enabled
 }
 
-export const useCameraPosition = ({ camera, controls, modelConfig }: UseCameraPositionOptions) => {
+export const useCameraPosition = ({ camera, controls, modelConfig, enabled = true }: UseCameraPositionOptions) => {
   const animationFrameRef = useRef<number>();
 
   useEffect(() => {
-    if (!camera || !controls) return;
+    if (!enabled || !camera || !controls) return;
 
     const { x: configX, y: configY, z: configZ } = modelConfig.cameraPosition;
     
@@ -75,6 +76,6 @@ export const useCameraPosition = ({ camera, controls, modelConfig }: UseCameraPo
         cancelAnimationFrame(animationFrameRef.current);
       }
     };
-  }, [camera, controls, modelConfig.id, modelConfig.cameraPosition]);
+  }, [camera, controls, modelConfig.id, modelConfig.cameraPosition, enabled]);
 };
 
