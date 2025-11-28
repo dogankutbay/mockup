@@ -21,6 +21,7 @@ export const useVideoAnimation = ({ camera, controls, mode }: UseVideoAnimationO
   const [isPlaying, setIsPlaying] = useState(false);
   const animationFrameRef = useRef<number>();
   const startTimeRef = useRef<number>(0);
+  const lastCameraPositionRef = useRef<{ x: number; y: number; z: number } | null>(null);
 
   // Stop playback when switching modes
   useEffect(() => {
@@ -135,8 +136,8 @@ export const useVideoAnimation = ({ camera, controls, mode }: UseVideoAnimationO
     };
   }, [isPlaying, duration, getCameraStateAtTime, applyCameraState, mode]);
 
-  // Add keyframe at current camera position
-  const addKeyframe = useCallback(() => {
+  // Add or update keyframe at current camera position
+  const addOrUpdateKeyframe = useCallback((auto: boolean = false) => {
     if (!camera || !controls) return;
 
     const newKeyframe: Keyframe = {
@@ -153,30 +154,96 @@ export const useVideoAnimation = ({ camera, controls, mode }: UseVideoAnimationO
       },
     };
 
-    console.log('🎬 Keyframe added:', {
-      time: currentTime.toFixed(2) + 's',
-      position: {
-        x: camera.position.x.toFixed(2),
-        y: camera.position.y.toFixed(2),
-        z: camera.position.z.toFixed(2),
-      }
-    });
-
     setKeyframes(prev => {
-      const updated = [...prev, newKeyframe].sort((a, b) => a.time - b.time);
+      // Check if keyframe exists at current time (within 0.1s tolerance)
+      const existingIndex = prev.findIndex(kf => Math.abs(kf.time - currentTime) < 0.1);
+      
+      let updated: Keyframe[];
+      if (existingIndex !== -1) {
+        // Update existing keyframe
+        updated = [...prev];
+        updated[existingIndex] = newKeyframe;
+        console.log(auto ? '🔄 Keyframe auto-updated:' : '✏️ Keyframe updated:', {
+          time: currentTime.toFixed(2) + 's',
+          position: {
+            x: camera.position.x.toFixed(2),
+            y: camera.position.y.toFixed(2),
+            z: camera.position.z.toFixed(2),
+          }
+        });
+      } else {
+        // Add new keyframe
+        updated = [...prev, newKeyframe].sort((a, b) => a.time - b.time);
+        console.log(auto ? '🎬 Keyframe auto-added:' : '🎬 Keyframe added:', {
+          time: currentTime.toFixed(2) + 's',
+          position: {
+            x: camera.position.x.toFixed(2),
+            y: camera.position.y.toFixed(2),
+            z: camera.position.z.toFixed(2),
+          }
+        });
+      }
+      
       console.log('📋 All keyframes:', updated.map(kf => ({
         time: kf.time.toFixed(2) + 's',
         y: kf.cameraPosition.y.toFixed(2)
       })));
       return updated;
     });
+
+    // Update last position ref
+    lastCameraPositionRef.current = {
+      x: camera.position.x,
+      y: camera.position.y,
+      z: camera.position.z,
+    };
   }, [camera, controls, currentTime]);
+
+  // Manual add keyframe (from button)
+  const addKeyframe = useCallback(() => {
+    addOrUpdateKeyframe(false);
+  }, [addOrUpdateKeyframe]);
+
+  // Auto-add keyframe when camera moves (manual user movement)
+  useEffect(() => {
+    if (!camera || !controls || mode !== 'video' || isPlaying) return;
+
+    const handleCameraChange = () => {
+      const current = {
+        x: camera.position.x,
+        y: camera.position.y,
+        z: camera.position.z,
+      };
+
+      // Check if camera actually moved (threshold to avoid noise)
+      if (lastCameraPositionRef.current) {
+        const dx = Math.abs(current.x - lastCameraPositionRef.current.x);
+        const dy = Math.abs(current.y - lastCameraPositionRef.current.y);
+        const dz = Math.abs(current.z - lastCameraPositionRef.current.z);
+        
+        if (dx > 0.01 || dy > 0.01 || dz > 0.01) {
+          // Camera moved significantly, auto-add/update keyframe
+          addOrUpdateKeyframe(true);
+        }
+      } else {
+        // First movement, store initial position
+        lastCameraPositionRef.current = current;
+      }
+    };
+
+    controls.addEventListener('change', handleCameraChange);
+
+    return () => {
+      controls.removeEventListener('change', handleCameraChange);
+    };
+  }, [camera, controls, mode, isPlaying, addOrUpdateKeyframe]);
 
   // Reset all keyframes and animation state
   const handleResetAll = useCallback(() => {
     setKeyframes([]);
     setCurrentTime(0);
     setIsPlaying(false);
+    lastCameraPositionRef.current = null;
     
     // Reset camera to default centered position
     if (camera && controls) {
