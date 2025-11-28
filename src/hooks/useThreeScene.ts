@@ -23,8 +23,7 @@ export const useThreeScene = (mountRef: React.RefObject<HTMLDivElement>) => {
       sceneObjects.controls.minPolarAngle = 0;
       sceneObjects.controls.maxPolarAngle = Math.PI;
       sceneObjects.controls.enablePan = true;
-      // Use world-space panning instead of screen-space for more predictable movement
-      sceneObjects.controls.screenSpacePanning = false;
+      sceneObjects.controls.screenSpacePanning = true;
     } else {
       // Restore restrictions in picture mode
       sceneObjects.controls.minAzimuthAngle = ORBIT_CONTROLS.MIN_AZIMUTH;
@@ -75,6 +74,30 @@ export const useThreeScene = (mountRef: React.RefObject<HTMLDivElement>) => {
     controls.enablePan = true; // Enable panning for video mode
     controls.screenSpacePanning = true; // Default to screen-space panning
     setupControlLimits(controls);
+    
+    // Track original Z position to lock zoom during panning
+    let lockedZ: number | null = null;
+    
+    // Lock Z axis during panning in video mode
+    controls.addEventListener('start', () => {
+      // Store Z position when starting a pan operation
+      if (controls.enablePan) {
+        lockedZ = camera.position.z;
+      }
+    });
+    
+    controls.addEventListener('change', () => {
+      // Keep Z locked during panning if we stored it
+      if (lockedZ !== null && controls.enablePan) {
+        camera.position.z = lockedZ;
+      }
+    });
+    
+    controls.addEventListener('end', () => {
+      // Release the lock when done
+      lockedZ = null;
+    });
+    
     controls.update();
 
     // Store scene objects
