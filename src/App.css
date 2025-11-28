@@ -1168,13 +1168,12 @@
   min-width: 150px;
 }
 
-/* Video Frame Indicator - Shows 1080x1080 export area */
+/* Video Frame Indicator - Shows export area */
 .video-frame-indicator {
   position: fixed;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  aspect-ratio: 1; /* Keep it square */
   border: 3px dashed hsl(var(--primary) / 0.4);
   border-radius: 12px;
   z-index: 50;
@@ -1188,7 +1187,7 @@
 }
 
 .video-frame-indicator::before {
-  content: '1080×1080 Export Area';
+  content: 'Export area';
   position: absolute;
   top: -2rem;
   left: 50%;
