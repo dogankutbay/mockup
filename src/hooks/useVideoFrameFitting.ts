@@ -11,6 +11,7 @@ interface UseVideoFrameFittingOptions {
   camera: THREE.PerspectiveCamera | null;
   controls: any; // OrbitControls
   mode: 'picture' | 'video';
+  hasKeyframes: boolean; // Don't auto-fit if user has keyframes
 }
 
 export const useVideoFrameFitting = ({
@@ -18,9 +19,11 @@ export const useVideoFrameFitting = ({
   camera,
   controls,
   mode,
+  hasKeyframes,
 }: UseVideoFrameFittingOptions) => {
   useEffect(() => {
-    if (!phoneModel || !camera || !controls || mode !== 'video') return;
+    // Don't auto-fit if keyframes exist (user has custom positions)
+    if (!phoneModel || !camera || !controls || mode !== 'video' || hasKeyframes) return;
 
     // Calculate bounding box of the phone model
     const boundingBox = new THREE.Box3().setFromObject(phoneModel);

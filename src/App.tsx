@@ -129,12 +129,13 @@ function App() {
     mode,
   });
 
-  // Auto-fit phone to video frame when entering video mode
+  // Auto-fit phone to video frame when entering video mode (only if no keyframes)
   useVideoFrameFitting({
     phoneModel,
     camera: sceneObjects?.camera || null,
     controls: sceneObjects?.controls || null,
     mode,
+    hasKeyframes: keyframes.length > 0,
   });
 
   // Reset camera to flat/centered position (0, 0, z)
