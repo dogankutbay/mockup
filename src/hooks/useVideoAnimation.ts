@@ -87,6 +87,8 @@ export const useVideoAnimation = ({ camera, controls, mode }: UseVideoAnimationO
 
     isApplyingStateRef.current = true; // Mark as programmatic change
 
+    isApplyingStateRef.current = true;
+
     camera.position.set(
       state.cameraPosition.x,
       state.cameraPosition.y,
@@ -169,30 +171,22 @@ export const useVideoAnimation = ({ camera, controls, mode }: UseVideoAnimationO
         // Update existing keyframe
         updated = [...prev];
         updated[existingIndex] = newKeyframe;
-        console.log(auto ? '🔄 Keyframe auto-updated:' : '✏️ Keyframe updated:', {
-          time: currentTime.toFixed(2) + 's',
-          position: {
-            x: camera.position.x.toFixed(2),
-            y: camera.position.y.toFixed(2),
-            z: camera.position.z.toFixed(2),
-          }
+        console.log(auto ? '🔄 Auto keyframe (updated)' : '✏️ Keyframe updated', {
+          time: currentTime.toFixed(2),
+          y: camera.position.y.toFixed(2),
         });
       } else {
         // Add new keyframe
         updated = [...prev, newKeyframe].sort((a, b) => a.time - b.time);
-        console.log(auto ? '🎬 Keyframe auto-added:' : '🎬 Keyframe added:', {
-          time: currentTime.toFixed(2) + 's',
-          position: {
-            x: camera.position.x.toFixed(2),
-            y: camera.position.y.toFixed(2),
-            z: camera.position.z.toFixed(2),
-          }
+        console.log(auto ? '🎬 Auto keyframe' : '🎬 Keyframe', {
+          time: currentTime.toFixed(2),
+          y: camera.position.y.toFixed(2),
         });
       }
       
-      console.log('📋 All keyframes:', updated.map(kf => ({
-        time: kf.time.toFixed(2) + 's',
-        y: kf.cameraPosition.y.toFixed(2)
+      console.table(updated.map(kf => ({
+        time: kf.time.toFixed(2),
+        y: kf.cameraPosition.y.toFixed(2),
       })));
       return updated;
     });
@@ -297,28 +291,21 @@ export const useVideoAnimation = ({ camera, controls, mode }: UseVideoAnimationO
   };
 
   const handleTimeChange = (time: number) => {
-    console.log('⏱️ Timeline changed to:', time.toFixed(2) + 's');
     setCurrentTime(time);
     setIsPlaying(false); // Pause when manually scrubbing
     
     const state = getCameraStateAtTime(time);
     if (state) {
-      console.log('📍 Should move camera to:', {
-        time: state.time.toFixed(2) + 's',
-        y: state.cameraPosition.y.toFixed(2)
-      });
       applyCameraState(state);
-      
-      // Verify position after applying
       setTimeout(() => {
         if (camera) {
-          console.log('✅ Camera actually at:', {
-            x: camera.position.x.toFixed(2),
-            y: camera.position.y.toFixed(2),
-            z: camera.position.z.toFixed(2)
+          console.log('⏱️ Timeline', {
+            time: time.toFixed(2),
+            targetY: state.cameraPosition.y.toFixed(2),
+            actualY: camera.position.y.toFixed(2),
           });
         }
-      }, 100);
+      }, 80);
     }
   };
 
