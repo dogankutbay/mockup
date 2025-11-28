@@ -32,6 +32,7 @@ import { useCameraPosition } from './hooks/useCameraPosition';
 import { useVideoAnimation } from './hooks/useVideoAnimation';
 import { useVideoFrameFitting } from './hooks/useVideoFrameFitting';
 import { exportCanvasAsImage } from './utils/exportUtils';
+import { exportVideo } from './utils/videoExport';
 import { DEFAULT_PHONE_MODEL } from './config/phoneModels';
 import type { AppError } from './types';
 import type { PhoneModelConfig } from './config/phoneModels';
@@ -382,23 +383,44 @@ function App() {
               onResetAll={handleResetAll}
               onTransparentBackgroundChange={setTransparentBackground}
               onExport={async () => {
-                // TODO: Implement actual video export
-                setExportState('rendering');
-                setExportProgress(0);
-                
-                // Simulate export progress
-                for (let i = 0; i <= 100; i += 5) {
-                  await new Promise(resolve => setTimeout(resolve, 100));
-                  setExportProgress(i);
+                if (!sceneObjects) {
+                  setError({ message: 'Scene not ready', type: 'export' });
+                  return;
                 }
-                
-                setExportState('done');
-                
-                // Reset after 3 seconds
-                setTimeout(() => {
+
+                try {
+                  setExportState('rendering');
+                  setExportProgress(0);
+                  
+                  await exportVideo({
+                    scene: sceneObjects.scene,
+                    camera: sceneObjects.camera,
+                    renderer: sceneObjects.renderer,
+                    keyframes,
+                    duration,
+                    fps: 30,
+                    aspectRatio: frameAspectRatio,
+                    transparentBackground,
+                    backgroundColor,
+                    onProgress: setExportProgress,
+                  });
+                  
+                  setExportState('done');
+                  
+                  // Reset after 3 seconds
+                  setTimeout(() => {
+                    setExportState('idle');
+                    setExportProgress(0);
+                  }, 3000);
+                } catch (err) {
+                  console.error('Video export error:', err);
+                  setError({ 
+                    message: err instanceof Error ? err.message : 'Video export failed', 
+                    type: 'export' 
+                  });
                   setExportState('idle');
                   setExportProgress(0);
-                }, 3000);
+                }
               }}
               disabled={isLoading}
             />
