@@ -270,12 +270,28 @@ export const useVideoAnimation = ({ camera, controls, mode }: UseVideoAnimationO
   };
 
   const handleTimeChange = (time: number) => {
+    console.log('⏱️ Timeline changed to:', time.toFixed(2) + 's');
     setCurrentTime(time);
     setIsPlaying(false); // Pause when manually scrubbing
     
     const state = getCameraStateAtTime(time);
     if (state) {
+      console.log('📍 Should move camera to:', {
+        time: state.time.toFixed(2) + 's',
+        y: state.cameraPosition.y.toFixed(2)
+      });
       applyCameraState(state);
+      
+      // Verify position after applying
+      setTimeout(() => {
+        if (camera) {
+          console.log('✅ Camera actually at:', {
+            x: camera.position.x.toFixed(2),
+            y: camera.position.y.toFixed(2),
+            z: camera.position.z.toFixed(2)
+          });
+        }
+      }, 100);
     }
   };
 
