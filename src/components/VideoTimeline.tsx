@@ -3,7 +3,7 @@
  * Timeline controls for video mode animation
  */
 
-import React from 'react';
+import React, { useState } from 'react';
 import { FaPlay, FaPause, FaPlus, FaDownload } from 'react-icons/fa';
 
 export interface Keyframe {
@@ -39,8 +39,39 @@ export const VideoTimeline: React.FC<VideoTimelineProps> = ({
   onExport,
   disabled = false,
 }) => {
+  const [isEditingDuration, setIsEditingDuration] = useState(false);
+  const [durationInputValue, setDurationInputValue] = useState(duration.toFixed(1));
+
   const formatTime = (seconds: number) => {
     return `${seconds.toFixed(1)}s`;
+  };
+
+  const handleDurationClick = () => {
+    setIsEditingDuration(true);
+    setDurationInputValue(duration.toFixed(1));
+  };
+
+  const handleDurationChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setDurationInputValue(e.target.value);
+  };
+
+  const handleDurationBlur = () => {
+    const newDuration = parseFloat(durationInputValue);
+    if (!isNaN(newDuration) && newDuration >= 1 && newDuration <= 10) {
+      onDurationChange(newDuration);
+    } else {
+      setDurationInputValue(duration.toFixed(1));
+    }
+    setIsEditingDuration(false);
+  };
+
+  const handleDurationKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      handleDurationBlur();
+    } else if (e.key === 'Escape') {
+      setDurationInputValue(duration.toFixed(1));
+      setIsEditingDuration(false);
+    }
   };
 
   return (
@@ -67,7 +98,27 @@ export const VideoTimeline: React.FC<VideoTimelineProps> = ({
         <div className="video-timeline-info">
           <span className="video-time">{formatTime(currentTime)}</span>
           <span className="video-divider">/</span>
-          <span className="video-duration">{formatTime(duration)}</span>
+          {isEditingDuration ? (
+            <input
+              type="text"
+              className="video-duration-input"
+              value={durationInputValue}
+              onChange={handleDurationChange}
+              onBlur={handleDurationBlur}
+              onKeyDown={handleDurationKeyDown}
+              disabled={disabled || isRecording}
+              autoFocus
+              placeholder="10.0"
+            />
+          ) : (
+            <span 
+              className="video-duration editable" 
+              onClick={handleDurationClick}
+              title="Click to edit duration (1-10s)"
+            >
+              {formatTime(duration)}
+            </span>
+          )}
         </div>
       </div>
 
@@ -95,23 +146,6 @@ export const VideoTimeline: React.FC<VideoTimelineProps> = ({
               />
             ))}
           </div>
-        </div>
-        
-        <div className="duration-control">
-          <label htmlFor="duration-slider" className="duration-label">
-            Duration:
-          </label>
-          <input
-            id="duration-slider"
-            type="range"
-            min="1"
-            max="10"
-            step="0.5"
-            value={duration}
-            onChange={(e) => onDurationChange(parseFloat(e.target.value))}
-            disabled={disabled || isRecording}
-            className="duration-slider"
-          />
         </div>
       </div>
 
