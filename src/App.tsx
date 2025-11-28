@@ -17,6 +17,7 @@ import { ScreenshotGallery } from './components/ScreenshotGallery';
 import { ModeToggle } from './components/ModeToggle';
 import { VideoTimeline } from './components/VideoTimeline';
 import { FrameZoomControls } from './components/FrameZoomControls';
+import { ResizableFrame } from './components/ResizableFrame';
 import type { AppMode } from './components/ModeToggle';
 import { FaLightbulb, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 import { useThreeScene } from './hooks/useThreeScene';
@@ -262,17 +263,12 @@ function App() {
         {isLoading && <LoadingState message="Loading phone model..." />}
         <PhoneViewer mountRef={mountRef} />
         
-        {/* Square frame indicator in video mode */}
+        {/* Resizable square frame in video mode */}
         {mode === 'video' && (
           <>
-            <div 
-              className="video-frame-indicator" 
-              style={{ 
-                width: `${frameZoom * 100}%`,
-                height: `${frameZoom * 100}%`,
-                maxWidth: `min(${frameZoom * 90}vh, ${frameZoom * 90}vw)`,
-                maxHeight: `min(${frameZoom * 90}vh, ${frameZoom * 90}vw)`,
-              }} 
+            <ResizableFrame
+              zoom={frameZoom}
+              onZoomChange={setFrameZoom}
             />
             <FrameZoomControls
               zoom={frameZoom}

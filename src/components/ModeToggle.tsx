@@ -23,7 +23,7 @@ export const ModeToggle: React.FC<ModeToggleProps> = ({ mode, onModeChange }) =>
           aria-label="Picture mode"
         >
           <FaImage />
-          <span>Picture</span>
+          <span>Picture mode</span>
         </button>
         <button
           className={`mode-toggle-btn ${mode === 'video' ? 'active' : ''}`}
@@ -31,7 +31,7 @@ export const ModeToggle: React.FC<ModeToggleProps> = ({ mode, onModeChange }) =>
           aria-label="Video mode"
         >
           <FaVideo />
-          <span>Video</span>
+          <span>Video mode</span>
         </button>
       </div>
     </div>
