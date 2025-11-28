@@ -1276,93 +1276,59 @@
   color: hsl(var(--primary));
 }
 
-/* Resize Handles */
-.resize-handle {
-  position: absolute;
-  background: hsl(var(--primary));
-  opacity: 0;
-  transition: opacity 0.2s ease;
-}
-
-.video-frame-indicator:hover .resize-handle {
-  opacity: 0.6;
-}
-
-.resize-handle:hover {
-  opacity: 1 !important;
-}
-
-/* Corner handles */
-.resize-handle.corner {
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  z-index: 52;
-}
-
-.resize-handle.corner.top-left {
-  top: -10px;
-  left: -10px;
-  cursor: nwse-resize;
-}
-
-.resize-handle.corner.top-right {
-  top: -10px;
-  right: -10px;
-  cursor: nesw-resize;
-}
-
-.resize-handle.corner.bottom-left {
-  bottom: -10px;
-  left: -10px;
-  cursor: nesw-resize;
-}
-
-.resize-handle.corner.bottom-right {
-  bottom: -10px;
-  right: -10px;
-  cursor: nwse-resize;
-}
-
-/* Edge handles */
-.resize-handle.edge {
-  z-index: 51;
-}
-
-.resize-handle.edge.top,
-.resize-handle.edge.bottom {
+/* Aspect Ratio Selector */
+.aspect-ratio-selector {
+  position: fixed;
+  top: 2rem;
   left: 50%;
   transform: translateX(-50%);
-  width: 60px;
-  height: 8px;
-  border-radius: 4px;
-  cursor: ns-resize;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: hsl(var(--background));
+  border: 1px solid hsl(var(--border));
+  border-radius: var(--radius);
+  padding: 0.5rem;
+  box-shadow: 0 4px 12px rgb(0 0 0 / 0.1);
+  z-index: 200;
+  animation: fadeInFrame 0.3s ease;
 }
 
-.resize-handle.edge.top {
-  top: -4px;
+.aspect-ratio-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  border: 1px solid hsl(var(--border));
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  background: hsl(var(--background));
+  color: hsl(var(--foreground));
 }
 
-.resize-handle.edge.bottom {
-  bottom: -4px;
+.aspect-ratio-btn:hover:not(:disabled):not(.active) {
+  background: hsl(var(--accent));
+  border-color: hsl(var(--primary) / 0.5);
 }
 
-.resize-handle.edge.left,
-.resize-handle.edge.right {
-  top: 50%;
-  transform: translateY(-50%);
-  width: 8px;
-  height: 60px;
-  border-radius: 4px;
-  cursor: ew-resize;
+.aspect-ratio-btn.active {
+  background: hsl(var(--primary));
+  color: hsl(var(--primary-foreground));
+  border-color: hsl(var(--primary));
 }
 
-.resize-handle.edge.left {
-  left: -4px;
+.aspect-ratio-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
 }
 
-.resize-handle.edge.right {
-  right: -4px;
+.aspect-ratio-btn svg {
+  width: 1rem;
+  height: 1rem;
 }
 
 /* Responsive Design */

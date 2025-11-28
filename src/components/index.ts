@@ -17,6 +17,8 @@ export { ModeToggle } from './ModeToggle';
 export { VideoTimeline } from './VideoTimeline';
 export { FrameZoomControls } from './FrameZoomControls';
 export { ResizableFrame } from './ResizableFrame';
+export { AspectRatioSelector } from './AspectRatioSelector';
 export type { AppMode } from './ModeToggle';
 export type { Keyframe } from './VideoTimeline';
+export type { FrameAspectRatio } from './ResizableFrame';
 

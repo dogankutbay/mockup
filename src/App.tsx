@@ -18,7 +18,9 @@ import { ModeToggle } from './components/ModeToggle';
 import { VideoTimeline } from './components/VideoTimeline';
 import { FrameZoomControls } from './components/FrameZoomControls';
 import { ResizableFrame } from './components/ResizableFrame';
+import { AspectRatioSelector } from './components/AspectRatioSelector';
 import type { AppMode } from './components/ModeToggle';
+import type { FrameAspectRatio } from './components/ResizableFrame';
 import { FaLightbulb, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 import { useThreeScene } from './hooks/useThreeScene';
 import { usePhoneModel } from './hooks/usePhoneModel';
@@ -41,6 +43,7 @@ function App() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mode, setMode] = useState<AppMode>('picture');
   const [frameZoom, setFrameZoom] = useState(0.7); // Default 70% of max viewport size
+  const [frameAspectRatio, setFrameAspectRatio] = useState<FrameAspectRatio>('square');
 
   // Initialize Three.js scene
   const { sceneObjects, setControlsForVideoMode } = useThreeScene(mountRef);
@@ -263,12 +266,17 @@ function App() {
         {isLoading && <LoadingState message="Loading phone model..." />}
         <PhoneViewer mountRef={mountRef} />
         
-        {/* Resizable square frame in video mode */}
+        {/* Frame with aspect ratio controls in video mode */}
         {mode === 'video' && (
           <>
             <ResizableFrame
               zoom={frameZoom}
-              onZoomChange={setFrameZoom}
+              aspectRatio={frameAspectRatio}
+            />
+            <AspectRatioSelector
+              aspectRatio={frameAspectRatio}
+              onAspectRatioChange={setFrameAspectRatio}
+              disabled={false}
             />
             <FrameZoomControls
               zoom={frameZoom}
