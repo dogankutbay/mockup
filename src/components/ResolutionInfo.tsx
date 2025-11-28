@@ -13,7 +13,7 @@ interface ResolutionInfoProps {
 export const ResolutionInfo: React.FC<ResolutionInfoProps> = ({ model }) => {
   return (
     <p className="resolution-info">
-      For perfect results, upload in {model.screenResolution.width}×{model.screenResolution.height} resolution
+      For perfect results, upload in {model.screenResolution.width}×{model.screenResolution.height}@3x resolution or you'll have blurry images.
     </p>
   );
 };

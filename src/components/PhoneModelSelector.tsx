@@ -54,7 +54,7 @@ export const PhoneModelSelector: React.FC<PhoneModelSelectorProps> = ({
                 {getManufacturerDisplay(model.manufacturer)}
               </div>
               <div className="phone-model-card-resolution">
-                {model.screenResolution.width}×{model.screenResolution.height}
+                {model.screenResolution.width}×{model.screenResolution.height}@3x
               </div>
             </div>
           </button>

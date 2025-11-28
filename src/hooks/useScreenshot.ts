@@ -14,11 +14,16 @@ interface UseScreenshotOptions {
   onError?: (error: AppError) => void;
 }
 
+interface ScreenshotItem {
+  dataUrl: string;
+  fileName: string;
+}
+
 export const useScreenshot = ({ phoneModel, modelConfig, onError }: UseScreenshotOptions) => {
-  const [screenshots, setScreenshots] = useState<string[]>([]);
+  const [screenshots, setScreenshots] = useState<ScreenshotItem[]>([]);
   const [activeIndex, setActiveIndex] = useState<number>(-1);
 
-  const activeScreenshot = activeIndex >= 0 ? screenshots[activeIndex] : null;
+  const activeScreenshot = activeIndex >= 0 ? screenshots[activeIndex]?.dataUrl : null;
 
   // Apply active screenshot to phone when available
   useEffect(() => {
@@ -42,6 +47,8 @@ export const useScreenshot = ({ phoneModel, modelConfig, onError }: UseScreensho
     const file = event.target.files?.[0];
     if (!file) return;
 
+    const fileName = file.name;
+
     // Validate file
     const validation = validateImageFile(file);
     if (!validation.valid) {
@@ -57,7 +64,7 @@ export const useScreenshot = ({ phoneModel, modelConfig, onError }: UseScreensho
     reader.onload = (e) => {
       const result = e.target?.result;
       if (typeof result === 'string') {
-        setScreenshots(prev => [...prev, result]);
+        setScreenshots(prev => [...prev, { dataUrl: result, fileName }]);
         setActiveIndex(prev => prev + 1);
       }
     };

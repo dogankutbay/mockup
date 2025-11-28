@@ -6,8 +6,13 @@
 import React from 'react';
 import { FaTrash } from 'react-icons/fa';
 
+interface ScreenshotItem {
+  dataUrl: string;
+  fileName: string;
+}
+
 interface ScreenshotGalleryProps {
-  screenshots: string[];
+  screenshots: ScreenshotItem[];
   activeIndex: number;
   onSelectScreenshot: (index: number) => void;
   onClearAll: () => void;
@@ -28,14 +33,15 @@ export const ScreenshotGallery: React.FC<ScreenshotGalleryProps> = ({
   return (
     <div className="screenshot-gallery">
       <div className="screenshot-gallery-header">
-        <span className="screenshot-gallery-title">Uploaded Screenshots ({screenshots.length})</span>
+        <span className="screenshot-gallery-title">Uploaded ({screenshots.length})</span>
         <button
-          className="btn-clear-all"
+          className="btn-clear-all tooltip-trigger-left"
           onClick={onClearAll}
           disabled={disabled}
           aria-label="Clear all screenshots"
         >
-          <FaTrash /> Clear All
+          <FaTrash />
+          <span className="tooltip-left">Clear All</span>
         </button>
       </div>
       
@@ -47,8 +53,9 @@ export const ScreenshotGallery: React.FC<ScreenshotGalleryProps> = ({
             onClick={() => onSelectScreenshot(index)}
             disabled={disabled}
             aria-label={`Select screenshot ${index + 1}`}
+            title={screenshot.fileName}
           >
-            <img src={screenshot} alt={`Screenshot ${index + 1}`} />
+            <img src={screenshot.dataUrl} alt={`Screenshot ${index + 1}`} />
             <span className="screenshot-number">{index + 1}</span>
           </button>
         ))}
