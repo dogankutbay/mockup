@@ -11,6 +11,27 @@ import type { ThreeSceneObjects } from '../types';
 export const useThreeScene = (mountRef: React.RefObject<HTMLDivElement>) => {
   const [sceneObjects, setSceneObjects] = useState<ThreeSceneObjects | null>(null);
   const animationFrameId = useRef<number>();
+  
+  // Function to toggle controls for video mode
+  const setControlsForVideoMode = (isVideoMode: boolean) => {
+    if (!sceneObjects?.controls) return;
+    
+    if (isVideoMode) {
+      // Remove all restrictions in video mode for free movement
+      sceneObjects.controls.minAzimuthAngle = -Infinity;
+      sceneObjects.controls.maxAzimuthAngle = Infinity;
+      sceneObjects.controls.minPolarAngle = 0;
+      sceneObjects.controls.maxPolarAngle = Math.PI;
+      sceneObjects.controls.enablePan = true;
+    } else {
+      // Restore restrictions in picture mode
+      sceneObjects.controls.minAzimuthAngle = ORBIT_CONTROLS.MIN_AZIMUTH;
+      sceneObjects.controls.maxAzimuthAngle = ORBIT_CONTROLS.MAX_AZIMUTH;
+      sceneObjects.controls.minPolarAngle = ORBIT_CONTROLS.MIN_POLAR;
+      sceneObjects.controls.maxPolarAngle = ORBIT_CONTROLS.MAX_POLAR;
+      sceneObjects.controls.enablePan = true;
+    }
+  };
 
   useEffect(() => {
     if (!mountRef.current) return;
@@ -48,6 +69,7 @@ export const useThreeScene = (mountRef: React.RefObject<HTMLDivElement>) => {
 
     // Setup controls
     const controls = new OrbitControls(camera, renderer.domElement);
+    controls.enablePan = true; // Enable panning for video mode
     setupControlLimits(controls);
     controls.update();
 
@@ -121,7 +143,7 @@ export const useThreeScene = (mountRef: React.RefObject<HTMLDivElement>) => {
     };
   }, [mountRef]);
 
-  return sceneObjects;
+  return { sceneObjects, setControlsForVideoMode };
 };
 
 /**

@@ -39,7 +39,14 @@ function App() {
   const [mode, setMode] = useState<AppMode>('picture');
 
   // Initialize Three.js scene
-  const sceneObjects = useThreeScene(mountRef);
+  const { sceneObjects, setControlsForVideoMode } = useThreeScene(mountRef);
+  
+  // Update controls when mode changes
+  React.useEffect(() => {
+    if (setControlsForVideoMode) {
+      setControlsForVideoMode(mode === 'video');
+    }
+  }, [mode, setControlsForVideoMode]);
 
   // Track camera position changes from OrbitControls
   React.useEffect(() => {
@@ -243,6 +250,9 @@ function App() {
       <main className={`app-main ${sidebarCollapsed ? 'sidebar-collapsed' : ''} ${mode === 'video' ? 'video-mode' : ''}`}>
         {isLoading && <LoadingState message="Loading phone model..." />}
         <PhoneViewer mountRef={mountRef} />
+        
+        {/* Square frame indicator in video mode */}
+        {mode === 'video' && <div className="video-frame-indicator" />}
         
         <ModeToggle mode={mode} onModeChange={setMode} />
         

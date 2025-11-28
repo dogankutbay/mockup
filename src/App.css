@@ -1205,6 +1205,48 @@
   min-width: 150px;
 }
 
+/* Video Frame Indicator - Shows 1080x1080 export area */
+.video-frame-indicator {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: min(90vh, 90vw); /* Square frame that fits the screen */
+  height: min(90vh, 90vw);
+  border: 3px dashed hsl(var(--primary) / 0.4);
+  border-radius: 12px;
+  pointer-events: none;
+  z-index: 50;
+  animation: fadeInFrame 0.3s ease;
+}
+
+.video-frame-indicator::before {
+  content: '1080×1080 Export Area';
+  position: absolute;
+  top: -2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 0.5rem 1rem;
+  background: hsl(var(--primary));
+  color: hsl(var(--primary-foreground));
+  font-size: 0.875rem;
+  font-weight: 600;
+  border-radius: var(--radius);
+  white-space: nowrap;
+  box-shadow: 0 2px 8px rgb(0 0 0 / 0.1);
+}
+
+@keyframes fadeInFrame {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
 /* Responsive Design */
 @media (max-width: 1024px) {
   .sidebar {
