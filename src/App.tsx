@@ -25,6 +25,7 @@ import { useScreenshot } from './hooks/useScreenshot';
 import { useBackgroundColor } from './hooks/useBackgroundColor';
 import { useCameraPosition } from './hooks/useCameraPosition';
 import { useVideoAnimation } from './hooks/useVideoAnimation';
+import { useVideoFrameFitting } from './hooks/useVideoFrameFitting';
 import { exportCanvasAsImage } from './utils/exportUtils';
 import { DEFAULT_PHONE_MODEL } from './config/phoneModels';
 import type { AppError } from './types';
@@ -118,6 +119,14 @@ function App() {
     handleDurationChange,
     addKeyframe,
   } = useVideoAnimation({
+    camera: sceneObjects?.camera || null,
+    controls: sceneObjects?.controls || null,
+    mode,
+  });
+
+  // Auto-fit phone to video frame when entering video mode
+  useVideoFrameFitting({
+    phoneModel,
     camera: sceneObjects?.camera || null,
     controls: sceneObjects?.controls || null,
     mode,

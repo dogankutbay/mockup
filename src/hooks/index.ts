@@ -9,4 +9,5 @@ export { useScreenshot } from './useScreenshot';
 export { useBackgroundColor } from './useBackgroundColor';
 export { useCameraPosition } from './useCameraPosition';
 export { useVideoAnimation } from './useVideoAnimation';
+export { useVideoFrameFitting } from './useVideoFrameFitting';
 
