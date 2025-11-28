@@ -22,6 +22,7 @@ export const useVideoAnimation = ({ camera, controls, mode }: UseVideoAnimationO
   const animationFrameRef = useRef<number>();
   const startTimeRef = useRef<number>(0);
   const lastCameraPositionRef = useRef<{ x: number; y: number; z: number } | null>(null);
+  const isApplyingStateRef = useRef<boolean>(false); // Track programmatic camera changes
 
   // Stop playback when switching modes
   useEffect(() => {
@@ -84,24 +85,29 @@ export const useVideoAnimation = ({ camera, controls, mode }: UseVideoAnimationO
   const applyCameraState = useCallback((state: Keyframe) => {
     if (!camera || !controls) return;
 
+    isApplyingStateRef.current = true; // Mark as programmatic change
+
     camera.position.set(
       state.cameraPosition.x,
       state.cameraPosition.y,
       state.cameraPosition.z
     );
 
-    console.log('🎥 Applying camera state:', {
-      time: state.time.toFixed(2) + 's',
-      position: {
-        x: state.cameraPosition.x.toFixed(2),
-        y: state.cameraPosition.y.toFixed(2),
-        z: state.cameraPosition.z.toFixed(2),
-      }
-    });
+    // Update last position to prevent auto-keyframe trigger
+    lastCameraPositionRef.current = {
+      x: state.cameraPosition.x,
+      y: state.cameraPosition.y,
+      z: state.cameraPosition.z,
+    };
 
     // Note: We're using OrbitControls, so rotation is handled differently
     // We'll need to set the target instead
     controls.update();
+
+    // Allow manual changes again after a short delay
+    setTimeout(() => {
+      isApplyingStateRef.current = false;
+    }, 50);
   }, [camera, controls]);
 
   // Animation loop for playback
@@ -204,11 +210,14 @@ export const useVideoAnimation = ({ camera, controls, mode }: UseVideoAnimationO
     addOrUpdateKeyframe(false);
   }, [addOrUpdateKeyframe]);
 
-  // Auto-add keyframe when camera moves (manual user movement)
+  // Auto-add keyframe when camera moves (manual user movement ONLY)
   useEffect(() => {
     if (!camera || !controls || mode !== 'video' || isPlaying) return;
 
     const handleCameraChange = () => {
+      // Ignore if this is a programmatic change (from playback/scrubbing)
+      if (isApplyingStateRef.current) return;
+
       const current = {
         x: camera.position.x,
         y: camera.position.y,
@@ -222,7 +231,7 @@ export const useVideoAnimation = ({ camera, controls, mode }: UseVideoAnimationO
         const dz = Math.abs(current.z - lastCameraPositionRef.current.z);
         
         if (dx > 0.01 || dy > 0.01 || dz > 0.01) {
-          // Camera moved significantly, auto-add/update keyframe
+          // Camera moved significantly by USER, auto-add/update keyframe
           addOrUpdateKeyframe(true);
         }
       } else {
