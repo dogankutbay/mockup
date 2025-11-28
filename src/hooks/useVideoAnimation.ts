@@ -163,31 +163,39 @@ export const useVideoAnimation = ({ camera, controls, mode }: UseVideoAnimationO
     };
 
     setKeyframes(prev => {
-      // Check if keyframe exists at current time (within 0.1s tolerance)
-      const existingIndex = prev.findIndex(kf => Math.abs(kf.time - currentTime) < 0.1);
+      // Check if keyframe exists at current time (within 0.05s tolerance)
+      const existingIndex = prev.findIndex(kf => Math.abs(kf.time - currentTime) < 0.05);
       
       let updated: Keyframe[];
       if (existingIndex !== -1) {
         // Update existing keyframe
         updated = [...prev];
         updated[existingIndex] = newKeyframe;
-        console.log(auto ? '🔄 Auto keyframe (updated)' : '✏️ Keyframe updated', {
-          time: currentTime.toFixed(2),
-          y: camera.position.y.toFixed(2),
-        });
+        console.log(
+          auto ? '🔄 Auto keyframe (updated)' : '✏️ Keyframe updated',
+          JSON.stringify({
+            time: currentTime.toFixed(2),
+            y: camera.position.y.toFixed(2),
+          })
+        );
       } else {
         // Add new keyframe
         updated = [...prev, newKeyframe].sort((a, b) => a.time - b.time);
-        console.log(auto ? '🎬 Auto keyframe' : '🎬 Keyframe', {
-          time: currentTime.toFixed(2),
-          y: camera.position.y.toFixed(2),
-        });
+        console.log(
+          auto ? '🎬 Auto keyframe' : '🎬 Keyframe',
+          JSON.stringify({
+            time: currentTime.toFixed(2),
+            y: camera.position.y.toFixed(2),
+          })
+        );
       }
       
-      console.table(updated.map(kf => ({
-        time: kf.time.toFixed(2),
-        y: kf.cameraPosition.y.toFixed(2),
-      })));
+      console.table(
+        updated.map(kf => ({
+          time: kf.time.toFixed(2),
+          y: kf.cameraPosition.y.toFixed(2),
+        }))
+      );
       return updated;
     });
 
@@ -254,16 +262,17 @@ export const useVideoAnimation = ({ camera, controls, mode }: UseVideoAnimationO
 
     // Listen to mousedown/mouseup on the canvas
     const canvas = controls.domElement;
-    canvas.addEventListener('mousedown', handleInteractionStart);
-    canvas.addEventListener('mouseup', handleInteractionEnd);
-    canvas.addEventListener('wheel', handleInteractionStart); // For zoom
-    canvas.addEventListener('wheel', handleInteractionEnd);
+    const wheelOptions = { passive: true };
+    canvas.addEventListener('mousedown', handleInteractionStart, false);
+    canvas.addEventListener('mouseup', handleInteractionEnd, false);
+    canvas.addEventListener('wheel', handleInteractionStart, wheelOptions); // For zoom
+    canvas.addEventListener('wheel', handleInteractionEnd, wheelOptions);
 
     return () => {
-      canvas.removeEventListener('mousedown', handleInteractionStart);
-      canvas.removeEventListener('mouseup', handleInteractionEnd);
-      canvas.removeEventListener('wheel', handleInteractionStart);
-      canvas.removeEventListener('wheel', handleInteractionEnd);
+      canvas.removeEventListener('mousedown', handleInteractionStart, false);
+      canvas.removeEventListener('mouseup', handleInteractionEnd, false);
+      canvas.removeEventListener('wheel', handleInteractionStart, wheelOptions);
+      canvas.removeEventListener('wheel', handleInteractionEnd, wheelOptions);
       clearTimeout(interactionTimeout);
     };
   }, [camera, controls, mode, isPlaying, addOrUpdateKeyframe]);
@@ -299,11 +308,14 @@ export const useVideoAnimation = ({ camera, controls, mode }: UseVideoAnimationO
       applyCameraState(state);
       setTimeout(() => {
         if (camera) {
-          console.log('⏱️ Timeline', {
-            time: time.toFixed(2),
-            targetY: state.cameraPosition.y.toFixed(2),
-            actualY: camera.position.y.toFixed(2),
-          });
+          console.log(
+            '⏱️ Timeline',
+            JSON.stringify({
+              time: time.toFixed(2),
+              targetY: state.cameraPosition.y.toFixed(2),
+              actualY: camera.position.y.toFixed(2),
+            })
+          );
         }
       }, 80);
     }
