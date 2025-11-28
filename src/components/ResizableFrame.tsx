@@ -20,9 +20,9 @@ export const ResizableFrame: React.FC<ResizableFrameProps> = ({ zoom, aspectRati
       const size = `min(${zoom * 70}vh, ${zoom * 70}vw)`;
       return { width: size, height: size };
     } else {
-      // Vertical: 600x1080 (9:16-ish ratio for phone)
-      const width = `${zoom * 40}vw`; // Narrower
-      const height = `${zoom * 70}vh`; // Taller
+      // Vertical: 9:16 ratio (narrower and taller, like a phone screen)
+      const height = `${zoom * 80}vh`; // Taller
+      const width = `${zoom * 35}vh`; // Narrower - based on height to maintain ratio
       return { width, height };
     }
   };
@@ -39,4 +39,3 @@ export const ResizableFrame: React.FC<ResizableFrameProps> = ({ zoom, aspectRati
     />
   );
 };
-

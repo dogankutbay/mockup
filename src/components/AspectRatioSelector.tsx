@@ -20,28 +20,29 @@ export const AspectRatioSelector: React.FC<AspectRatioSelectorProps> = ({
 }) => {
   return (
     <div className="aspect-ratio-selector">
-      <button
-        className={`aspect-ratio-btn ${aspectRatio === 'square' ? 'active' : ''}`}
-        onClick={() => onAspectRatioChange('square')}
-        disabled={disabled}
-        aria-label="Square aspect ratio (1080x1080)"
-        title="Square (1080x1080)"
-      >
-        <FaSquare />
-        <span>Square</span>
-      </button>
-      
-      <button
-        className={`aspect-ratio-btn ${aspectRatio === 'vertical' ? 'active' : ''}`}
-        onClick={() => onAspectRatioChange('vertical')}
-        disabled={disabled}
-        aria-label="Vertical aspect ratio (600x1080)"
-        title="Vertical (600x1080)"
-      >
-        <FaMobileAlt />
-        <span>Vertical</span>
-      </button>
+      <div className="aspect-ratio-buttons">
+        <button
+          className={`aspect-ratio-btn ${aspectRatio === 'square' ? 'active' : ''}`}
+          onClick={() => onAspectRatioChange('square')}
+          disabled={disabled}
+          aria-label="Square aspect ratio (1080x1080)"
+          title="Square (1080x1080)"
+        >
+          <FaSquare />
+          <span>Square</span>
+        </button>
+        
+        <button
+          className={`aspect-ratio-btn ${aspectRatio === 'vertical' ? 'active' : ''}`}
+          onClick={() => onAspectRatioChange('vertical')}
+          disabled={disabled}
+          aria-label="Vertical aspect ratio (9:16)"
+          title="Vertical (9:16)"
+        >
+          <FaMobileAlt />
+          <span>Vertical</span>
+        </button>
+      </div>
     </div>
   );
 };
-

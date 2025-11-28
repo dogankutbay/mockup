@@ -4,7 +4,7 @@
  */
 
 import React, { useState } from 'react';
-import { FaPlay, FaPause, FaPlus, FaDownload, FaUndo } from 'react-icons/fa';
+import { FaPlay, FaPause, FaPlus, FaUndo, FaCheck } from 'react-icons/fa';
 
 export interface Keyframe {
   time: number; // 0-10 seconds
@@ -13,18 +13,24 @@ export interface Keyframe {
   controlsTarget: { x: number; y: number; z: number };
 }
 
+export type ExportState = 'idle' | 'rendering' | 'done';
+
 interface VideoTimelineProps {
   currentTime: number;
   duration: number;
   keyframes: Keyframe[];
   isPlaying: boolean;
   isRecording: boolean;
+  exportState: ExportState;
+  exportProgress: number; // 0-100
+  transparentBackground: boolean;
   onTimeChange: (time: number) => void;
   onDurationChange: (duration: number) => void;
   onPlayPause: () => void;
   onAddKeyframe: () => void;
   onResetAll: () => void;
   onExport: () => void;
+  onTransparentBackgroundChange: (value: boolean) => void;
   disabled?: boolean;
 }
 
@@ -34,12 +40,16 @@ export const VideoTimeline: React.FC<VideoTimelineProps> = ({
   keyframes,
   isPlaying,
   isRecording,
+  exportState,
+  exportProgress,
+  transparentBackground,
   onTimeChange,
   onDurationChange,
   onPlayPause,
   onAddKeyframe,
   onResetAll,
   onExport,
+  onTransparentBackgroundChange,
   disabled = false,
 }) => {
   const [isEditingDuration, setIsEditingDuration] = useState(false);
@@ -77,13 +87,16 @@ export const VideoTimeline: React.FC<VideoTimelineProps> = ({
     }
   };
 
+  const isExporting = exportState === 'rendering';
+  const isExportDone = exportState === 'done';
+
   return (
     <div className="video-timeline">
       <div className="video-timeline-left">
         <button
           className="video-control-btn"
           onClick={onPlayPause}
-          disabled={disabled || isRecording}
+          disabled={disabled || isRecording || isExporting}
           aria-label={isPlaying ? 'Pause' : 'Play'}
         >
           {isPlaying ? <FaPause /> : <FaPlay />}
@@ -92,7 +105,7 @@ export const VideoTimeline: React.FC<VideoTimelineProps> = ({
         <button
           className="video-control-btn"
           onClick={onAddKeyframe}
-          disabled={disabled || isRecording}
+          disabled={disabled || isRecording || isExporting}
           aria-label="Add keyframe"
         >
           <FaPlus /> Keyframe
@@ -101,7 +114,7 @@ export const VideoTimeline: React.FC<VideoTimelineProps> = ({
         <button
           className="video-control-btn"
           onClick={onResetAll}
-          disabled={disabled || isRecording || keyframes.length === 0}
+          disabled={disabled || isRecording || isExporting || keyframes.length === 0}
           aria-label="Reset all keyframes"
           title="Reset all keyframes"
         >
@@ -119,7 +132,7 @@ export const VideoTimeline: React.FC<VideoTimelineProps> = ({
               onChange={handleDurationChange}
               onBlur={handleDurationBlur}
               onKeyDown={handleDurationKeyDown}
-              disabled={disabled || isRecording}
+              disabled={disabled || isRecording || isExporting}
               autoFocus
               placeholder="10.0"
             />
@@ -144,7 +157,7 @@ export const VideoTimeline: React.FC<VideoTimelineProps> = ({
             step="0.1"
             value={currentTime}
             onChange={(e) => onTimeChange(parseFloat(e.target.value))}
-            disabled={disabled || isRecording}
+            disabled={disabled || isRecording || isExporting}
             className="timeline-slider"
           />
           
@@ -154,8 +167,9 @@ export const VideoTimeline: React.FC<VideoTimelineProps> = ({
               <div
                 key={index}
                 className="keyframe-marker"
-                style={{ left: `calc(1.2% + ${(keyframe.time / duration) * 97.6}%)` }}
+                style={{ left: `calc(1.5% + ${(keyframe.time / duration) * 97.6}%)` }}
                 title={`Keyframe at ${formatTime(keyframe.time)}`}
+                onClick={() => onTimeChange(keyframe.time)}
               />
             ))}
           </div>
@@ -163,16 +177,36 @@ export const VideoTimeline: React.FC<VideoTimelineProps> = ({
       </div>
 
       <div className="video-timeline-right">
+      
         <button
-          className="btn btn-primary video-export-btn"
+          className={`btn video-export-btn ${isExportDone ? 'btn-success' : 'btn-primary'}`}
           onClick={onExport}
-          disabled={disabled || isRecording || keyframes.length < 2}
-          aria-label="Export video"
+          disabled={disabled || isRecording || isExporting || keyframes.length < 2}
+          aria-label="Render and export video"
         >
-          <FaDownload /> Export MP4
+          {isExporting ? (
+            <div className="export-progress-wrapper">
+              <div className="export-progress-bar" style={{ width: `${exportProgress}%` }} />
+              <span className="export-progress-text">{Math.round(exportProgress)}%</span>
+            </div>
+          ) : isExportDone ? (
+            <>
+              <FaCheck /> Done!
+            </>
+          ) : (
+            'Render & Export'
+          )}
         </button>
+        <label className="transparent-checkbox">
+          <input
+            type="checkbox"
+            checked={transparentBackground}
+            onChange={(e) => onTransparentBackgroundChange(e.target.checked)}
+            disabled={disabled || isRecording || isExporting}
+          />
+          <span>Transparent background</span>
+        </label>
       </div>
     </div>
   );
 };
-

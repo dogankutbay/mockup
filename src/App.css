@@ -1183,7 +1183,72 @@ body {
 }
 
 .video-export-btn {
-  min-width: 150px;
+  min-width: 160px;
+  position: relative;
+  overflow: hidden;
+}
+
+.video-export-btn.btn-success {
+  background: #f7faf2;
+  border-color: #5ea500;
+  color: #3f6e00;
+}
+
+.video-export-btn.btn-success:hover {
+  background: #e7f3d3;
+  border-color: #5ea500;
+  color: #3f6e00;
+}
+
+/* Export progress bar inside button */
+.export-progress-wrapper {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.export-progress-bar {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  background: hsl(var(--primary) / 0.3);
+  transition: width 0.1s ease;
+}
+
+.export-progress-text {
+  position: relative;
+  z-index: 1;
+  font-weight: 600;
+}
+
+/* Transparent background checkbox */
+.transparent-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.8rem;
+  color: hsl(var(--foreground));
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+}
+
+.transparent-checkbox input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: hsl(var(--primary));
+  cursor: pointer;
+}
+
+.transparent-checkbox span {
+  opacity: 0.9;
+}
+
+.transparent-checkbox:hover span {
+  opacity: 1;
 }
 
 /* Video Frame Indicator - Shows export area */
@@ -1297,6 +1362,7 @@ body {
   left: 50%;
   transform: translateX(-50%);
   display: flex;
+  flex-direction: column;
   align-items: center;
   gap: 0.5rem;
   background: hsl(var(--background));
@@ -1306,6 +1372,12 @@ body {
   box-shadow: 0 4px 12px rgb(0 0 0 / 0.1);
   z-index: 200;
   animation: fadeInFrame 0.3s ease;
+}
+
+.aspect-ratio-buttons {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 .aspect-ratio-btn {
@@ -1344,7 +1416,6 @@ body {
   width: 1rem;
   height: 1rem;
 }
-
 /* Responsive Design */
 @media (max-width: 1024px) {
   .sidebar {

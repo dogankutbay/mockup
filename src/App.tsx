@@ -22,6 +22,7 @@ import { ResizableFrame } from './components/ResizableFrame';
 import { AspectRatioSelector } from './components/AspectRatioSelector';
 import type { AppMode } from './components/ModeToggle';
 import type { FrameAspectRatio } from './components/ResizableFrame';
+import type { ExportState } from './components/VideoTimeline';
 import { FaLightbulb, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 import { useThreeScene } from './hooks/useThreeScene';
 import { usePhoneModel } from './hooks/usePhoneModel';
@@ -45,6 +46,9 @@ function App() {
   const [mode, setMode] = useState<AppMode>('picture');
   const [frameZoom, setFrameZoom] = useState(0.7); // Default 70% of max viewport size
   const [frameAspectRatio, setFrameAspectRatio] = useState<FrameAspectRatio>('square');
+  const [transparentBackground, setTransparentBackground] = useState(false);
+  const [exportState, setExportState] = useState<ExportState>('idle');
+  const [exportProgress, setExportProgress] = useState(0);
   type CameraState = { position: THREE.Vector3; target: THREE.Vector3 };
   const pictureCameraStateRef = useRef<CameraState | null>(null);
   const videoCameraStateRef = useRef<CameraState | null>(null);
@@ -327,7 +331,7 @@ function App() {
         <div className="sidebar-footer">
           <p className="sidebar-tip">
             <FaLightbulb className="tip-icon" />
-            <span>You can rotate the phone by clicking and dragging. Zoom with scroll wheel.</span>
+            <span>Left click to rotate the phone. Right click to drag up/down/left/right. Scroll to zoom.</span>
           </p>
         </div>
       </aside>
@@ -368,13 +372,33 @@ function App() {
               keyframes={keyframes}
               isPlaying={isPlaying}
               isRecording={false}
+              exportState={exportState}
+              exportProgress={exportProgress}
+              transparentBackground={transparentBackground}
               onTimeChange={handleTimeChange}
               onDurationChange={handleDurationChange}
               onPlayPause={handlePlayPause}
               onAddKeyframe={addKeyframe}
               onResetAll={handleResetAll}
-              onExport={() => {
-                setError({ message: 'Video export coming soon!', type: 'export' });
+              onTransparentBackgroundChange={setTransparentBackground}
+              onExport={async () => {
+                // TODO: Implement actual video export
+                setExportState('rendering');
+                setExportProgress(0);
+                
+                // Simulate export progress
+                for (let i = 0; i <= 100; i += 5) {
+                  await new Promise(resolve => setTimeout(resolve, 100));
+                  setExportProgress(i);
+                }
+                
+                setExportState('done');
+                
+                // Reset after 3 seconds
+                setTimeout(() => {
+                  setExportState('idle');
+                  setExportProgress(0);
+                }, 3000);
               }}
               disabled={isLoading}
             />
