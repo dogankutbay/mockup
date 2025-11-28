@@ -23,6 +23,8 @@ export const useThreeScene = (mountRef: React.RefObject<HTMLDivElement>) => {
       sceneObjects.controls.minPolarAngle = 0;
       sceneObjects.controls.maxPolarAngle = Math.PI;
       sceneObjects.controls.enablePan = true;
+      // Use world-space panning instead of screen-space for more predictable movement
+      sceneObjects.controls.screenSpacePanning = false;
     } else {
       // Restore restrictions in picture mode
       sceneObjects.controls.minAzimuthAngle = ORBIT_CONTROLS.MIN_AZIMUTH;
@@ -30,6 +32,7 @@ export const useThreeScene = (mountRef: React.RefObject<HTMLDivElement>) => {
       sceneObjects.controls.minPolarAngle = ORBIT_CONTROLS.MIN_POLAR;
       sceneObjects.controls.maxPolarAngle = ORBIT_CONTROLS.MAX_POLAR;
       sceneObjects.controls.enablePan = true;
+      sceneObjects.controls.screenSpacePanning = true;
     }
   };
 
@@ -70,6 +73,7 @@ export const useThreeScene = (mountRef: React.RefObject<HTMLDivElement>) => {
     // Setup controls
     const controls = new OrbitControls(camera, renderer.domElement);
     controls.enablePan = true; // Enable panning for video mode
+    controls.screenSpacePanning = true; // Default to screen-space panning
     setupControlLimits(controls);
     controls.update();
 
