@@ -8,6 +8,7 @@ export { ControlPanel } from './ControlPanel';
 export { LoadingState } from './LoadingState';
 export { ErrorMessage } from './ErrorMessage';
 export { BackgroundColorPicker } from './BackgroundColorPicker';
+export { PhoneColorPicker } from './PhoneColorPicker';
 export { PhoneModelSelector } from './PhoneModelSelector';
 export { ResolutionInfo } from './ResolutionInfo';
 export { CameraControls } from './CameraControls';

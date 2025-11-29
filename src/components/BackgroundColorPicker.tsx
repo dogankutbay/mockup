@@ -15,6 +15,7 @@ const PRESET_COLORS = [
   { name: 'White', value: '#FAFAFA' },
   { name: 'Light Gray', value: '#F8F8F8' },
   { name: 'Dark', value: '#0F0F10' },
+  { name: 'Multicolor', value: 'multicolor' }, // Special value to indicate multicolor/custom
 ];
 
 export const BackgroundColorPicker: React.FC<BackgroundColorPickerProps> = ({
@@ -23,13 +24,30 @@ export const BackgroundColorPicker: React.FC<BackgroundColorPickerProps> = ({
   disabled = false,
 }) => {
   const [hexInput, setHexInput] = React.useState(selectedColor.toUpperCase());
+  const [isMulticolorMode, setIsMulticolorMode] = React.useState(false);
+  
+  // Check if multicolor/custom is selected based on state or if color doesn't match presets
+  const isMulticolorSelected = isMulticolorMode || !PRESET_COLORS.slice(0, 3).some(
+    preset => selectedColor.toUpperCase() === preset.value.toUpperCase()
+  );
 
   // Sync with selectedColor when it changes from elsewhere
   React.useEffect(() => {
     setHexInput(selectedColor.toUpperCase());
+    // If color matches a preset, exit multicolor mode
+    if (PRESET_COLORS.slice(0, 3).some(preset => selectedColor.toUpperCase() === preset.value.toUpperCase())) {
+      setIsMulticolorMode(false);
+    }
   }, [selectedColor]);
 
   const handlePresetClick = (color: string) => {
+    if (color === 'multicolor') {
+      // Enable multicolor mode to show custom picker
+      setIsMulticolorMode(true);
+      return;
+    }
+    // Disable multicolor mode when selecting a preset
+    setIsMulticolorMode(false);
     onColorChange(color);
   };
 
@@ -75,49 +93,62 @@ export const BackgroundColorPicker: React.FC<BackgroundColorPickerProps> = ({
       <label className="color-picker-label">Background Color</label>
       
       <div className="color-presets">
-        {PRESET_COLORS.map((preset) => (
-          <button
-            key={preset.value}
-            className={`color-preset ${
-              selectedColor.toUpperCase() === preset.value ? 'selected' : ''
-            }`}
-            style={{ backgroundColor: preset.value }}
-            onClick={() => handlePresetClick(preset.value)}
-            disabled={disabled}
-            aria-label={`Select ${preset.name} background`}
-            title={preset.name}
-          />
-        ))}
+        {PRESET_COLORS.map((preset) => {
+          const isSelected = preset.value === 'multicolor' 
+            ? isMulticolorSelected 
+            : selectedColor.toUpperCase() === preset.value.toUpperCase();
+          
+          // For multicolor, show a gradient background
+          const buttonStyle = preset.value === 'multicolor' 
+            ? {
+                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #4facfe 75%, #00f2fe 100%)',
+              }
+            : { backgroundColor: preset.value };
+          
+          return (
+            <button
+              key={preset.value}
+              className={`color-preset ${isSelected ? 'selected' : ''}`}
+              style={buttonStyle}
+              onClick={() => handlePresetClick(preset.value)}
+              disabled={disabled}
+              aria-label={`Select ${preset.name} background`}
+              title={preset.name}
+            />
+          );
+        })}
       </div>
 
-      <div className="custom-color-picker">
-        <label htmlFor="custom-color" className="custom-color-label">
-          Custom Color
-        </label>
-        <div className="custom-color-input-wrapper">
-          <input
-            id="custom-color"
-            type="color"
-            value={selectedColor}
-            onChange={handleCustomColorChange}
-            disabled={disabled}
-            className="custom-color-input"
-            aria-label="Select custom background color"
-          />
-          <input
-            type="text"
-            value={hexInput}
-            onChange={handleHexInputChange}
-            onBlur={handleHexInputBlur}
-            onKeyDown={handleHexInputKeyDown}
-            disabled={disabled}
-            className="custom-color-hex-input"
-            placeholder="#FFFFFF"
-            maxLength={7}
-            aria-label="Enter hex color code"
-          />
+      {isMulticolorSelected && (
+        <div className="custom-color-picker">
+          <label htmlFor="custom-color" className="custom-color-label">
+            Custom Color
+          </label>
+          <div className="custom-color-input-wrapper">
+            <input
+              id="custom-color"
+              type="color"
+              value={selectedColor}
+              onChange={handleCustomColorChange}
+              disabled={disabled}
+              className="custom-color-input"
+              aria-label="Select custom background color"
+            />
+            <input
+              type="text"
+              value={hexInput}
+              onChange={handleHexInputChange}
+              onBlur={handleHexInputBlur}
+              onKeyDown={handleHexInputKeyDown}
+              disabled={disabled}
+              className="custom-color-hex-input"
+              placeholder="#FFFFFF"
+              maxLength={7}
+              aria-label="Enter hex color code"
+            />
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };

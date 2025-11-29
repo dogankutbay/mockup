@@ -7,6 +7,7 @@ export { useThreeScene } from './useThreeScene';
 export { usePhoneModel } from './usePhoneModel';
 export { useScreenshot } from './useScreenshot';
 export { useBackgroundColor } from './useBackgroundColor';
+export { usePhoneColor } from './usePhoneColor';
 export { useCameraPosition } from './useCameraPosition';
 export { useVideoAnimation } from './useVideoAnimation';
 export { useVideoFrameFitting } from './useVideoFrameFitting';

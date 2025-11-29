@@ -180,6 +180,88 @@ body {
   transform: translateY(-50%) translateX(-12px);
 }
 
+/* Tooltip Top - for elements that need tooltip above */
+.tooltip-trigger-top {
+  position: relative;
+  cursor: pointer;
+}
+
+.tooltip-top {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%) translateY(-8px);
+  padding: 0.5rem 0.75rem;
+  background: hsl(var(--primary));
+  color: hsl(var(--primary-foreground));
+  font-size: 0.875rem;
+  font-weight: 500;
+  border-radius: var(--radius);
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+  z-index: 1000;
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  margin-bottom: 0.5rem;
+}
+
+.tooltip-top::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 6px solid transparent;
+  border-top-color: hsl(var(--primary));
+}
+
+.tooltip-trigger-top:hover .tooltip-top {
+  opacity: 1;
+  transform: translateX(-50%) translateY(-12px);
+}
+
+/* Tooltip Right - for left-side elements */
+.tooltip-trigger-right {
+  position: relative;
+  cursor: pointer;
+}
+
+.tooltip-right {
+  position: absolute;
+  left: 100%;
+  top: 50%;
+  transform: translateY(-50%) translateX(8px);
+  padding: 0.5rem 0.75rem;
+  background: hsl(var(--primary));
+  color: hsl(var(--primary-foreground));
+  font-size: 0.875rem;
+  font-weight: 500;
+  border-radius: var(--radius);
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+  z-index: 1000;
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  margin-left: 0.5rem;
+}
+
+.tooltip-right::after {
+  content: '';
+  position: absolute;
+  right: 100%;
+  top: 50%;
+  transform: translateY(-50%);
+  border: 6px solid transparent;
+  border-right-color: hsl(var(--primary));
+}
+
+.tooltip-trigger-right:hover .tooltip-right {
+  opacity: 1;
+  transform: translateY(-50%) translateX(12px);
+}
+
 .sidebar-content {
   flex: 1;
   padding: 2rem 1.5rem;
@@ -398,13 +480,14 @@ body {
 .color-presets {
   display: flex;
   gap: 0.75rem;
-  justify-content: center;
+  justify-content: flex-start;
+  margin-bottom: 1rem;
 }
 
 .color-preset {
-  width: 50px;
-  height: 50px;
-  border-radius: var(--radius);
+  width: 32px;
+  height: 32px;
+  border-radius: 9999px;
   border: 2px solid hsl(var(--border));
   cursor: pointer;
   transition: all 0.15s ease;

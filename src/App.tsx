@@ -10,6 +10,7 @@ import { ControlPanel } from './components/ControlPanel';
 import { LoadingState } from './components/LoadingState';
 import { ErrorMessage } from './components/ErrorMessage';
 import { BackgroundColorPicker } from './components/BackgroundColorPicker';
+import { PhoneColorPicker } from './components/PhoneColorPicker';
 import { PhoneModelSelector } from './components/PhoneModelSelector';
 import { ResolutionInfo } from './components/ResolutionInfo';
 import { CameraControls } from './components/CameraControls';
@@ -28,6 +29,7 @@ import { useThreeScene } from './hooks/useThreeScene';
 import { usePhoneModel } from './hooks/usePhoneModel';
 import { useScreenshot } from './hooks/useScreenshot';
 import { useBackgroundColor } from './hooks/useBackgroundColor';
+import { usePhoneColor } from './hooks/usePhoneColor';
 import { useCameraPosition } from './hooks/useCameraPosition';
 import { useVideoAnimation } from './hooks/useVideoAnimation';
 import { useVideoFrameFitting } from './hooks/useVideoFrameFitting';
@@ -114,14 +116,25 @@ function App() {
     initialColor: '#FAFAFA',
   });
 
+  // Handle phone color
+  const { phoneColor, setPhoneColor } = usePhoneColor({
+    phoneModel,
+    modelConfig: selectedModel,
+    initialColor: '#1C1C1E', // Black Titanium / Phantom Black (default)
+  });
+
   // Reset saved camera states when phone model changes
   useEffect(() => {
     if (selectedModel.id !== lastModelIdRef.current) {
       pictureCameraStateRef.current = null;
       videoCameraStateRef.current = null;
       lastModelIdRef.current = selectedModel.id;
+      
+      // Reset phone color to first preset color for the new model (Black)
+      const defaultColor = '#1C1C1E'; // Black Titanium / Phantom Black
+      setPhoneColor(defaultColor);
     }
-  }, [selectedModel.id]);
+  }, [selectedModel.id, selectedModel.manufacturer, setPhoneColor]);
 
   // Adjust camera position based on selected model (Picture mode only)
   // Re-run when model changes (pictureCameraStateRef gets cleared above)
@@ -295,6 +308,13 @@ function App() {
           />
           
           <ResolutionInfo model={selectedModel} />
+          
+          <PhoneColorPicker
+            selectedColor={phoneColor}
+            onColorChange={setPhoneColor}
+            modelConfig={selectedModel}
+            disabled={isLoading}
+          />
           
           <ControlPanel
             onScreenshotUpload={handleScreenshotUpload}
