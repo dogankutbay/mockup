@@ -5,7 +5,7 @@
  */
 
 import * as THREE from 'three';
-import type { Keyframe } from '../components/VideoTimeline';
+import type { Keyframe, EasingType } from '../components/VideoTimeline';
 import type { FrameAspectRatio } from '../components/ResizableFrame';
 
 interface VideoExportOptions {
@@ -22,16 +22,39 @@ interface VideoExportOptions {
   onProgress: (progress: number) => void;
 }
 
-// Easing function (ease in-out cubic)
-const easeInOutCubic = (t: number): number => {
-  return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+// Easing functions (must match useVideoAnimation.ts)
+const easingFunctions: Record<EasingType, (t: number) => number> = {
+  'ease-in': (t: number) => t * t * t, // Cubic ease-in
+  'ease-out': (t: number) => 1 - Math.pow(1 - t, 3), // Cubic ease-out
+  'ease-in-out': (t: number) => t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2, // Cubic ease-in-out
+  'bouncy': (t: number) => {
+    // Bouncy easing with multiple bounces
+    const c1 = 1.70158;
+    const c3 = c1 + 1;
+    return 1 + c3 * Math.pow(t - 1, 3) + c1 * Math.pow(t - 1, 2);
+  },
+  'soft-bouncy': (t: number) => {
+    // Softer bounce
+    const c1 = 1.1;
+    const c3 = c1 + 0.5;
+    return 1 + c3 * Math.pow(t - 1, 3) + c1 * Math.pow(t - 1, 2);
+  },
+  'gentle': (t: number) => {
+    // Gentle ease (sine-based)
+    return -(Math.cos(Math.PI * t) - 1) / 2;
+  },
 };
 
 // Interpolate between two keyframes
 const interpolateKeyframes = (kf1: Keyframe, kf2: Keyframe, time: number): Keyframe => {
   const timeDiff = kf2.time - kf1.time;
   const t = timeDiff > 0 ? (time - kf1.time) / timeDiff : 0;
-  const easedT = easeInOutCubic(Math.max(0, Math.min(1, t)));
+  const clampedT = Math.max(0, Math.min(1, t));
+  
+  // Use easing from kf1 (easing applies to the segment after this keyframe)
+  const easingType: EasingType = kf1.easing || 'ease-in-out';
+  const easingFn = easingFunctions[easingType];
+  const easedT = easingFn(clampedT);
 
   return {
     time,

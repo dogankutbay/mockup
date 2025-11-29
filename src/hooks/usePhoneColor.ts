@@ -28,6 +28,60 @@ const getColorableMeshNames = (manufacturer: 'apple' | 'samsung'): string[] => {
 };
 
 /**
+ * Calculate material properties based on color brightness
+ * Darker colors can handle higher metalness, lighter colors need less
+ */
+const getMaterialProperties = (color: string, isIPhone: boolean) => {
+  if (!isIPhone) {
+    return {
+      metalness: 0.5,
+      roughness: 0.1,
+      clearcoat: 0.5,
+      clearcoatRoughness: 0.2,
+    };
+  }
+
+  // Convert hex to RGB to calculate brightness
+  let hex = color.replace('#', '');
+  // Handle 3-character hex codes
+  if (hex.length === 3) {
+    hex = hex.split('').map(char => char + char).join('');
+  }
+  const r = parseInt(hex.substr(0, 2), 16);
+  const g = parseInt(hex.substr(2, 2), 16);
+  const b = parseInt(hex.substr(4, 2), 16);
+  const brightness = (r * 299 + g * 587 + b * 114) / 1000; // Perceived brightness
+  
+  // Darker colors (like black) can be more metallic
+  // Lighter/brighter colors need less metalness to stay vibrant
+  if (brightness < 50) {
+    // Very dark colors - high metalness works well
+    return {
+      metalness: 0.95,
+      roughness: 0.05,
+      clearcoat: 1.0,
+      clearcoatRoughness: 0.1,
+    };
+  } else if (brightness < 150) {
+    // Medium-dark colors
+    return {
+      metalness: 0.75,
+      roughness: 0.1,
+      clearcoat: 0.8,
+      clearcoatRoughness: 0.15,
+    };
+  } else {
+    // Bright/light colors - reduce metalness and clearcoat to keep them vibrant
+    return {
+      metalness: 0.5,
+      roughness: 0.2,
+      clearcoat: 0.6,
+      clearcoatRoughness: 0.2,
+    };
+  }
+};
+
+/**
  * Apply color to phone body meshes
  */
 const applyPhoneColor = (
@@ -37,6 +91,8 @@ const applyPhoneColor = (
 ): void => {
   const colorableMeshNames = getColorableMeshNames(modelConfig.manufacturer);
   const threeColor = new THREE.Color(color);
+  const isIPhone = modelConfig.manufacturer === 'apple';
+  const materialProps = getMaterialProperties(color, isIPhone);
   
   phone.traverse((child) => {
     if (child instanceof THREE.Mesh) {
@@ -66,10 +122,13 @@ const applyPhoneColor = (
           child.material = oldMaterials.map((mat) => {
             if (shouldReplaceMaterial) {
               // Always replace for iPhone
-              return new THREE.MeshStandardMaterial({
+              // Use MeshPhysicalMaterial for better reflections and shininess
+              return new THREE.MeshPhysicalMaterial({
                 color: threeColor,
-                metalness: 0.7,
-                roughness: 0.3,
+                metalness: materialProps.metalness,
+                roughness: materialProps.roughness,
+                clearcoat: materialProps.clearcoat,
+                clearcoatRoughness: materialProps.clearcoatRoughness,
                 emissive: 0x000000,
               });
             } else {
@@ -83,8 +142,8 @@ const applyPhoneColor = (
               } else {
                 return new THREE.MeshStandardMaterial({
                   color: threeColor,
-                  metalness: 0.5,
-                  roughness: 0.5,
+                  metalness: 0.7,
+                  roughness: 0.1,
                   emissive: 0x000000,
                 });
               }
@@ -98,13 +157,16 @@ const applyPhoneColor = (
           
           if (shouldReplaceMaterial) {
             // Always replace for iPhone to ensure color is visible
-            child.material = new THREE.MeshStandardMaterial({
+            // Use MeshPhysicalMaterial for better reflections and shininess
+            child.material = new THREE.MeshPhysicalMaterial({
               color: threeColor,
-              metalness: 0.7,
-              roughness: 0.3,
+              metalness: materialProps.metalness,
+              roughness: materialProps.roughness,
+              clearcoat: materialProps.clearcoat,
+              clearcoatRoughness: materialProps.clearcoatRoughness,
               emissive: 0x000000,
             });
-            console.log(`✅ Replaced material for "${child.name}" with new MeshStandardMaterial (color: ${color})`);
+            console.log(`✅ Replaced material for "${child.name}" with new MeshPhysicalMaterial (color: ${color}, metalness: ${materialProps.metalness})`);
           } else {
             // For Samsung, try to update existing material
             if (oldMaterial instanceof THREE.MeshStandardMaterial || 
@@ -121,7 +183,7 @@ const applyPhoneColor = (
               child.material = new THREE.MeshStandardMaterial({
                 color: threeColor,
                 metalness: 0.5,
-                roughness: 0.5,
+                roughness: 0.1,
                 emissive: 0x000000,
               });
               if (oldMaterial) {

@@ -19,16 +19,16 @@ export const CAMERA = {
 export const LIGHTING = {
   AMBIENT: {
     COLOR: 0xffffff,
-    INTENSITY: 2,
+    INTENSITY: 1.5, // Reduced to allow highlights to show better
   },
   DIRECTIONAL: {
     COLOR: 0xffffff,
-    INTENSITY: 1,
+    INTENSITY: 2.5, // Increased for stronger highlights
     POSITION: { X: 5, Y: 5, Z: 5 },
   },
   SPOT: {
     COLOR: 0xffffff,
-    INTENSITY: 0.9,
+    INTENSITY: 2.0, // Increased for stronger highlights
     POSITION: { X: 0, Y: 25, Z: 25 },
     ANGLE: 0.4,
     PENUMBRA: 0.8,
@@ -37,7 +37,7 @@ export const LIGHTING = {
   },
   POINT: {
     COLOR: 0xffffff,
-    INTENSITY: 2,
+    INTENSITY: 2.5, // Increased for stronger highlights
     DISTANCE: 50,
     POSITION: { X: 0, Y: 0, Z: 5 },
   },

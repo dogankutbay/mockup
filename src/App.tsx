@@ -156,6 +156,8 @@ function App() {
     handleDurationChange,
     addKeyframe,
     handleResetAll,
+    updateKeyframeTime,
+    updateEasing,
   } = useVideoAnimation({
     camera: sceneObjects?.camera || null,
     controls: sceneObjects?.controls || null,
@@ -402,6 +404,8 @@ function App() {
               onAddKeyframe={addKeyframe}
               onResetAll={handleResetAll}
               onTransparentBackgroundChange={setTransparentBackground}
+              onUpdateKeyframeTime={updateKeyframeTime}
+              onUpdateEasing={updateEasing}
               onExport={async () => {
                 if (!sceneObjects) {
                   setError({ message: 'Scene not ready', type: 'export' });

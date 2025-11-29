@@ -224,6 +224,11 @@ const setupLighting = (scene: THREE.Scene): void => {
     LIGHTING.POINT.POSITION.Z
   );
   scene.add(pointLight);
+
+  // Rim light for edge highlights (makes shiny surfaces pop)
+  const rimLight = new THREE.DirectionalLight(0xffffff, 1.5);
+  rimLight.position.set(-10, 5, -10).normalize();
+  scene.add(rimLight);
 };
 
 /**
