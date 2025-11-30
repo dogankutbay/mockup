@@ -264,10 +264,80 @@ body {
   transform: translateY(-50%) translateX(12px);
 }
 
+/* Upload Tooltip - Onboarding tooltip */
+.upload-tooltip {
+  position: absolute;
+  right:calc(-100% - 24px);
+  top: 25%;
+  padding: 0.75rem 1rem;
+  padding-right: 2.5rem;
+  background: hsl(var(--primary));
+  color: hsl(var(--primary-foreground));
+  font-size: 0.875rem;
+  font-weight: 500;
+  border-radius: var(--radius);
+  white-space: nowrap;
+  pointer-events: auto;
+  z-index: 1001;
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  margin-right: 0.5rem;
+  cursor: pointer;
+  animation: tooltipFloat 2s ease-in-out infinite;
+}
+
+.upload-tooltip::after {
+  content: '';
+  position: absolute;
+  right: 100%;
+  top: 40%;
+  border: 6px solid transparent;
+  border-right-color: hsl(var(--primary));
+}
+
+.upload-tooltip-close {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  background: transparent;
+  border: none;
+  color: hsl(var(--primary-foreground));
+  cursor: pointer;
+  padding: 0.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius);
+  opacity: 0.7;
+  transition: opacity 0.15s ease;
+  z-index: 1;
+}
+
+.upload-tooltip-close:hover {
+  opacity: 1;
+}
+
+.upload-tooltip-close svg {
+  width: 0.75rem;
+  height: 0.75rem;
+}
+
+.upload-tooltip-text {
+  margin: 0;
+  padding: 0;
+}
+
+@keyframes tooltipFloat {
+  0%, 100% {
+    transform: translateY(-50%);
+  }
+  50% {
+    transform: translateY(-60%);
+  }
+}
+
 .sidebar-content {
   flex: 1;
   padding: 2rem 1.5rem;
-  overflow-y: auto;
 }
 
 .sidebar-footer {
@@ -1688,32 +1758,136 @@ body {
   cursor: grabbing;
 }
 
+/* Hide mobile expand indicator on desktop */
+.mobile-expand-indicator {
+  display: none;
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
   .sidebar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    top: auto;
     width: 100%;
-    height: auto;
-    position: relative;
-  }
-
-  .app-main {
-    margin-left: 0;
-  }
-
-  .app {
+    height: 15vh; /* Show 15% initially */
+    max-height: 90vh;
+    border-right: none;
+    border-top: 1px solid hsl(var(--border));
+    border-radius: 1rem 1rem 0 0;
+    box-shadow: 0 -4px 12px rgb(0 0 0 / 0.1);
+    transition: height 0.3s ease, transform 0.3s ease;
+    transform: translateY(0);
+    z-index: 100;
+    overflow: hidden;
+    display: flex;
     flex-direction: column;
   }
 
+  .sidebar.mobile-expanded {
+    height: 90vh;
+  }
+
+  .sidebar.collapsed {
+    transform: translateY(calc(100% - 15vh)); /* Keep 15% visible when collapsed */
+    height: 15vh;
+  }
+
+  .sidebar.collapsed.mobile-expanded {
+    transform: translateY(0);
+    height: 90vh;
+  }
+
+  .sidebar-toggle {
+    display: none; /* Hide toggle button on mobile */
+  }
+
   .sidebar-header {
-    padding: 1.5rem;
+    padding: 1rem 0.75rem 1rem 1.5rem;
+    flex-shrink: 0;
+    border-bottom: 1px solid hsl(var(--border));
+    user-select: none;
+    cursor: grab;
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    touch-action: none;
+  }
+
+  .sidebar.dragging .sidebar-header {
+    cursor: grabbing;
+  }
+
+  .mobile-expand-indicator {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: hsl(var(--muted-foreground));
+    transition: transform 0.3s ease;
+    /* Make clickable area 44x44px */
+    min-width: 44px;
+    min-height: 44px;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    margin: 0;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    /* Center the icon visually */
+    position: relative;
+  }
+
+  .mobile-expand-indicator svg {
+    width: 1rem;
+    height: 1rem;
+    /* Center the icon within the 44x44px area */
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+  }
+
+  .mobile-expand-indicator:active {
+    opacity: 0.7;
+  }
+
+  /* Hide tooltips on mobile */
+  .tooltip-trigger .tooltip {
+    display: none;
   }
 
   .sidebar-title {
-    font-size: 1.5rem;
+    font-size: 1.25rem;
   }
 
   .sidebar-content {
     padding: 1.5rem;
+    overflow-y: auto;
+    flex: 1;
+    min-height: 0;
+  }
+
+  .sidebar-footer {
+    flex-shrink: 0;
+    padding: 1rem 1.5rem;
+  }
+
+  .app-main {
+    margin-left: 0;
+    margin-bottom: 15vh; /* Add space for bottom sheet */
+  }
+
+  .app-main.sidebar-collapsed {
+    margin-bottom: 0;
+  }
+
+  .app {
+    flex-direction: column;
   }
 
   .btn {

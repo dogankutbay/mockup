@@ -21,10 +21,11 @@ import { VideoTimeline } from './components/VideoTimeline';
 import { FrameZoomControls } from './components/FrameZoomControls';
 import { ResizableFrame } from './components/ResizableFrame';
 import { AspectRatioSelector } from './components/AspectRatioSelector';
+import { UploadTooltip } from './components/UploadTooltip';
 import type { AppMode } from './components/ModeToggle';
 import type { FrameAspectRatio } from './components/ResizableFrame';
 import type { ExportState } from './components/VideoTimeline';
-import { FaLightbulb, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
+import { FaLightbulb, FaChevronLeft, FaChevronRight, FaChevronUp, FaChevronDown } from 'react-icons/fa';
 import { useThreeScene } from './hooks/useThreeScene';
 import { usePhoneModel } from './hooks/usePhoneModel';
 import { useScreenshot } from './hooks/useScreenshot';
@@ -42,10 +43,17 @@ import './App.css';
 
 function App() {
   const mountRef = useRef<HTMLDivElement>(null);
+  const uploadButtonRef = useRef<HTMLButtonElement | null>(null);
   const [error, setError] = useState<AppError | null>(null);
   const [selectedModel, setSelectedModel] = useState<PhoneModelConfig>(DEFAULT_PHONE_MODEL);
   const [cameraPos, setCameraPos] = useState({ x: 0, y: 0, z: 10 });
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [mobileExpanded, setMobileExpanded] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragStartY, setDragStartY] = useState(0);
+  const [dragStartHeight, setDragStartHeight] = useState(0);
+  const [hasMoved, setHasMoved] = useState(false);
+  const sidebarRef = useRef<HTMLElement>(null);
   const [mode, setMode] = useState<AppMode>('picture');
   const [frameZoom, setFrameZoom] = useState(0.7); // Default 70% of max viewport size
   const [frameAspectRatio, setFrameAspectRatio] = useState<FrameAspectRatio>('square');
@@ -279,27 +287,238 @@ function App() {
     setError(null);
   };
 
+  // Handle mouse drag for mobile bottom sheet
+  useEffect(() => {
+    if (!isDragging) return;
+
+    const handleMouseMove = (e: MouseEvent) => {
+      const isMobile = window.innerWidth <= 768;
+      if (!isMobile) return;
+      
+      const currentY = e.clientY;
+      const deltaY = Math.abs(dragStartY - currentY);
+      
+      // Mark as moved if movement is more than 2px (very sensitive)
+      if (deltaY > 2) {
+        setHasMoved(true);
+      }
+      
+      const deltaYDirection = dragStartY - currentY; // Positive = dragging up (expand)
+      
+      // Start dragging immediately, even with small movements
+      if (sidebarRef.current) {
+        const viewportHeight = window.innerHeight;
+        const minHeight = viewportHeight * 0.15; // 15vh
+        const maxHeight = viewportHeight * 0.9; // 90vh
+        
+        let newHeight = dragStartHeight + deltaYDirection;
+        newHeight = Math.max(minHeight, Math.min(maxHeight, newHeight));
+        
+        sidebarRef.current.style.height = `${newHeight}px`;
+      }
+    };
+
+    const handleMouseUp = (e: MouseEvent) => {
+      const isMobile = window.innerWidth <= 768;
+      if (!isMobile) return;
+      
+      setIsDragging(false);
+      
+      if (sidebarRef.current) {
+        const currentHeight = sidebarRef.current.getBoundingClientRect().height;
+        const viewportHeight = window.innerHeight;
+        
+        // If user didn't move much, treat as tap and toggle
+        if (!hasMoved || Math.abs(currentHeight - dragStartHeight) < 10) {
+          setMobileExpanded(!mobileExpanded);
+          sidebarRef.current.style.height = '';
+        } else {
+          // Calculate velocity for quick swipes
+          const endY = e.clientY;
+          const totalDelta = dragStartY - endY;
+          const velocity = Math.abs(totalDelta) / 100; // Simple velocity calculation
+          
+          // For quick swipes, use velocity to determine direction
+          // Otherwise use height threshold
+          if (velocity > 0.5) {
+            // Quick swipe - go in the direction of the swipe
+            if (totalDelta > 0) {
+              // Swiped up - expand
+              setMobileExpanded(true);
+            } else {
+              // Swiped down - collapse
+              setMobileExpanded(false);
+            }
+          } else {
+            // Slow drag - use height threshold (40% instead of 50% for easier expansion)
+            const threshold = viewportHeight * 0.4;
+            if (currentHeight > threshold) {
+              setMobileExpanded(true);
+            } else {
+              setMobileExpanded(false);
+            }
+          }
+          
+          // Reset inline height to let CSS take over
+          sidebarRef.current.style.height = '';
+        }
+      }
+    };
+
+    window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('mouseup', handleMouseUp);
+
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, [isDragging, dragStartY, dragStartHeight, hasMoved, mobileExpanded]);
+
   return (
     <div className={`app ${mode === 'video' ? 'video-mode' : ''}`}>
       <ErrorMessage error={error} onDismiss={handleDismissError} />
       
-      <aside className={`sidebar ${sidebarCollapsed ? 'collapsed' : ''}`}>
+      <aside 
+        ref={sidebarRef}
+        className={`sidebar ${sidebarCollapsed ? 'collapsed' : ''} ${mobileExpanded ? 'mobile-expanded' : ''} ${isDragging ? 'dragging' : ''}`}
+      >
         <button 
           className="sidebar-toggle"
-          onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+          onClick={() => {
+            const isMobile = window.innerWidth <= 768;
+            if (isMobile) {
+              // On mobile, toggle expansion instead of collapse
+              setMobileExpanded(!mobileExpanded);
+            } else {
+              // On desktop, toggle collapse
+              setSidebarCollapsed(!sidebarCollapsed);
+            }
+          }}
           aria-label={sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
         >
           {sidebarCollapsed ? <FaChevronRight /> : <FaChevronLeft />}
         </button>
-        <div className="sidebar-header">
+        <div 
+          className="sidebar-header"
+          onTouchStart={(e) => {
+            const isMobile = window.innerWidth <= 768;
+            if (!isMobile) return;
+            setIsDragging(true);
+            setHasMoved(false);
+            setDragStartY(e.touches[0].clientY);
+            if (sidebarRef.current) {
+              const rect = sidebarRef.current.getBoundingClientRect();
+              setDragStartHeight(rect.height);
+            }
+          }}
+          onTouchMove={(e) => {
+            if (!isDragging) return;
+            const isMobile = window.innerWidth <= 768;
+            if (!isMobile) return;
+            e.preventDefault(); // Prevent scrolling while dragging
+            const currentY = e.touches[0].clientY;
+            const deltaY = Math.abs(dragStartY - currentY);
+            
+            // Mark as moved if movement is more than 2px (very sensitive)
+            if (deltaY > 2) {
+              setHasMoved(true);
+            }
+            
+            const deltaYDirection = dragStartY - currentY; // Positive = dragging up (expand)
+            
+            // Start dragging immediately, even with small movements
+            if (sidebarRef.current) {
+              const viewportHeight = window.innerHeight;
+              const minHeight = viewportHeight * 0.15; // 15vh
+              const maxHeight = viewportHeight * 0.9; // 90vh
+              
+              let newHeight = dragStartHeight + deltaYDirection;
+              newHeight = Math.max(minHeight, Math.min(maxHeight, newHeight));
+              
+              sidebarRef.current.style.height = `${newHeight}px`;
+            }
+          }}
+          onTouchEnd={(e) => {
+            if (!isDragging) return;
+            const isMobile = window.innerWidth <= 768;
+            if (!isMobile) return;
+            
+            setIsDragging(false);
+            
+            if (sidebarRef.current) {
+              const currentHeight = sidebarRef.current.getBoundingClientRect().height;
+              const viewportHeight = window.innerHeight;
+              
+              // If user didn't move much, treat as tap and toggle
+              if (!hasMoved || Math.abs(currentHeight - dragStartHeight) < 10) {
+                setMobileExpanded(!mobileExpanded);
+                sidebarRef.current.style.height = '';
+              } else {
+                // Calculate velocity for quick swipes
+                const endY = e.changedTouches[0].clientY;
+                const totalDelta = dragStartY - endY;
+                const velocity = Math.abs(totalDelta) / 100; // Simple velocity calculation
+                
+                // For quick swipes, use velocity to determine direction
+                // Otherwise use height threshold
+                if (velocity > 0.5) {
+                  // Quick swipe - go in the direction of the swipe
+                  if (totalDelta > 0) {
+                    // Swiped up - expand
+                    setMobileExpanded(true);
+                  } else {
+                    // Swiped down - collapse
+                    setMobileExpanded(false);
+                  }
+                } else {
+                  // Slow drag - use height threshold (40% instead of 50% for easier expansion)
+                  const threshold = viewportHeight * 0.4;
+                  if (currentHeight > threshold) {
+                    setMobileExpanded(true);
+                  } else {
+                    setMobileExpanded(false);
+                  }
+                }
+                
+                // Reset inline height to let CSS take over
+                sidebarRef.current.style.height = '';
+              }
+            }
+          }}
+          onMouseDown={(e) => {
+            const isMobile = window.innerWidth <= 768;
+            if (!isMobile) return;
+            e.preventDefault();
+            setIsDragging(true);
+            setDragStartY(e.clientY);
+            if (sidebarRef.current) {
+              const rect = sidebarRef.current.getBoundingClientRect();
+              setDragStartHeight(rect.height);
+            }
+          }}
+          style={{ touchAction: 'none' }}
+        >
           <img alt='Don Kutbay' src='donkutbay.png' width={48} height={48} className='rounded-full'/>
-          <div className='d-flex flex-column'>
+          <div className='d-flex flex-column' style={{ flex: 1 }}>
             <h1 className="sidebar-title tooltip-trigger">
               Don's mockups
               <span className="tooltip">don.kutbay@idt.net</span>
             </h1>
             <p className='text-muted font-size-12'>Supports android and ios devices</p>
           </div>
+          <button
+            className="mobile-expand-indicator"
+            onClick={(e) => {
+              const isMobile = window.innerWidth <= 768;
+              if (isMobile) {
+                e.stopPropagation();
+                setMobileExpanded(!mobileExpanded);
+              }
+            }}
+            aria-label={mobileExpanded ? "Collapse" : "Expand"}
+          >
+            {mobileExpanded ? <FaChevronDown /> : <FaChevronUp />}
+          </button>
         </div>
 
         <div className="sidebar-content">
@@ -318,11 +537,15 @@ function App() {
             disabled={isLoading}
           />
           
-          <ControlPanel
-            onScreenshotUpload={handleScreenshotUpload}
-            onExport={handleExport}
-            disabled={isLoading}
-          />
+          <div style={{ position: 'relative' }}>
+            <ControlPanel
+              onScreenshotUpload={handleScreenshotUpload}
+              onExport={handleExport}
+              disabled={isLoading}
+              uploadButtonRef={uploadButtonRef}
+            />
+            <UploadTooltip targetRef={uploadButtonRef} />
+          </div>
 
           <ScreenshotGallery
             screenshots={screenshots}

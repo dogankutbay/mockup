@@ -10,12 +10,14 @@ interface ControlPanelProps {
   onScreenshotUpload: (event: React.ChangeEvent<HTMLInputElement>) => void;
   onExport: () => void;
   disabled?: boolean;
+  uploadButtonRef?: React.RefObject<HTMLButtonElement | null>;
 }
 
 export const ControlPanel: React.FC<ControlPanelProps> = ({ 
   onScreenshotUpload, 
   onExport,
-  disabled = false 
+  disabled = false,
+  uploadButtonRef
 }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -36,6 +38,7 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
       />
       
       <button 
+        ref={uploadButtonRef}
         onClick={handleUploadClick}
         className="btn btn-primary"
         disabled={disabled}
