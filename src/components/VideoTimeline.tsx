@@ -302,25 +302,30 @@ export const VideoTimeline: React.FC<VideoTimelineProps> = ({
 
       <div className="video-timeline-right">
       
-        <button
-          className={`btn video-export-btn ${isExportDone ? 'btn-success' : 'btn-primary'}`}
-          onClick={onExport}
-          disabled={disabled || isRecording || isExporting || keyframes.length < 2}
-          aria-label="Render and export video"
-        >
-          {isExporting ? (
-            <div className="export-progress-wrapper">
-              <div className="export-progress-bar" style={{ width: `${exportProgress}%` }} />
-              <span className="export-progress-text">{Math.round(exportProgress)}%</span>
-            </div>
-          ) : isExportDone ? (
-            <>
-              <FaCheck /> Done!
-            </>
-          ) : (
-            'Render & Export'
+        <div className={`tooltip-trigger-top ${keyframes.length < 2 && !isExporting && !isRecording ? '' : 'tooltip-hidden'}`}>
+          <button
+            className={`btn video-export-btn ${isExportDone ? 'btn-success' : 'btn-primary'}`}
+            onClick={onExport}
+            disabled={disabled || isRecording || isExporting || keyframes.length < 2}
+            aria-label="Render and export video"
+          >
+            {isExporting ? (
+              <div className="export-progress-wrapper">
+                <div className="export-progress-bar" style={{ width: `${exportProgress}%` }} />
+                <span className="export-progress-text">{Math.round(exportProgress)}%</span>
+              </div>
+            ) : isExportDone ? (
+              <>
+                <FaCheck /> Done!
+              </>
+            ) : (
+              'Render & Export'
+            )}
+          </button>
+          {keyframes.length < 2 && !isExporting && !isRecording && (
+            <span className="tooltip-top">Add frames first</span>
           )}
-        </button>
+        </div>
         <label 
           className="transparent-checkbox"
           data-tooltip="During rendering background will turn black, it's fine"

@@ -22,6 +22,7 @@ import { FrameZoomControls } from './components/FrameZoomControls';
 import { ResizableFrame } from './components/ResizableFrame';
 import { AspectRatioSelector } from './components/AspectRatioSelector';
 import { UploadTooltip } from './components/UploadTooltip';
+import { ThemeSelector } from './components/ThemeSelector';
 import type { AppMode } from './components/ModeToggle';
 import type { FrameAspectRatio } from './components/ResizableFrame';
 import type { ExportState } from './components/VideoTimeline';
@@ -34,6 +35,7 @@ import { usePhoneColor } from './hooks/usePhoneColor';
 import { useCameraPosition } from './hooks/useCameraPosition';
 import { useVideoAnimation } from './hooks/useVideoAnimation';
 import { useVideoFrameFitting } from './hooks/useVideoFrameFitting';
+import { useTheme } from './hooks/useTheme';
 import { exportCanvasAsImage } from './utils/exportUtils';
 import { exportVideo } from './utils/videoExport';
 import { DEFAULT_PHONE_MODEL } from './config/phoneModels';
@@ -54,7 +56,9 @@ function App() {
   const [dragStartHeight, setDragStartHeight] = useState(0);
   const [hasMoved, setHasMoved] = useState(false);
   const sidebarRef = useRef<HTMLElement>(null);
+  const { theme, setTheme } = useTheme();
   const [mode, setMode] = useState<AppMode>('picture');
+
   const [frameZoom, setFrameZoom] = useState(0.7); // Default 70% of max viewport size
   const [frameAspectRatio, setFrameAspectRatio] = useState<FrameAspectRatio>('square');
   const [transparentBackground, setTransparentBackground] = useState(false);
@@ -123,6 +127,18 @@ function App() {
     scene: sceneObjects?.scene || null,
     initialColor: '#FAFAFA',
   });
+
+  // Auto-select background color based on theme (only when theme changes)
+  useEffect(() => {
+    if (theme === 'light') {
+      setBackgroundColor('#FAFAFA'); // 1st option - White
+    } else if (theme === 'light-contrast') {
+      setBackgroundColor('#F8F8F8'); // 2nd option - Light Gray
+    } else if (theme === 'dark') {
+      setBackgroundColor('#0F0F10'); // 3rd option - Dark
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [theme]); // Only depend on theme, not backgroundColor - allows manual changes
 
   // Handle phone color
   const { phoneColor, setPhoneColor } = usePhoneColor({
@@ -570,6 +586,12 @@ function App() {
           <CameraControls
             onResetCamera={handleResetCamera}
             onResetZoom={handleResetZoom}
+            disabled={isLoading}
+          />
+
+          <ThemeSelector
+            theme={theme}
+            onThemeChange={setTheme}
             disabled={isLoading}
           />
         </div>

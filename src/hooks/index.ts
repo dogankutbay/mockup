@@ -11,4 +11,6 @@ export { usePhoneColor } from './usePhoneColor';
 export { useCameraPosition } from './useCameraPosition';
 export { useVideoAnimation } from './useVideoAnimation';
 export { useVideoFrameFitting } from './useVideoFrameFitting';
+export { useTheme } from './useTheme';
+export type { ThemeMode } from './useTheme';
 
