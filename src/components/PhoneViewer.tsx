@@ -6,7 +6,7 @@
 import React from 'react';
 
 interface PhoneViewerProps {
-  mountRef: React.RefObject<HTMLDivElement>;
+  mountRef: React.RefObject<HTMLDivElement | null>;
 }
 
 export const PhoneViewer: React.FC<PhoneViewerProps> = ({ mountRef }) => {

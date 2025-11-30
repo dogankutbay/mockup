@@ -8,7 +8,7 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { CAMERA, LIGHTING, ORBIT_CONTROLS } from '../config/constants';
 import type { ThreeSceneObjects } from '../types';
 
-export const useThreeScene = (mountRef: React.RefObject<HTMLDivElement>) => {
+export const useThreeScene = (mountRef: React.RefObject<HTMLDivElement | null>) => {
   const [sceneObjects, setSceneObjects] = useState<ThreeSceneObjects | null>(null);
   const animationFrameId = useRef<number>();
   
