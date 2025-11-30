@@ -17,6 +17,10 @@ export const UploadTooltip: React.FC<UploadTooltipProps> = ({ targetRef }) => {
   const tooltipRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    // Don't show tooltip on mobile devices
+    const isMobile = window.innerWidth <= 768;
+    if (isMobile) return;
+
     // Check if tooltip has been shown before
     const hasBeenShown = localStorage.getItem(STORAGE_KEY) === 'true';
     if (hasBeenShown) return;

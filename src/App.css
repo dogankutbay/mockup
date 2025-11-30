@@ -1856,9 +1856,22 @@ body {
     opacity: 0.7;
   }
 
-  /* Hide tooltips on mobile */
-  .tooltip-trigger .tooltip {
-    display: none;
+  /* Hide all tooltips on mobile */
+  .tooltip-trigger .tooltip,
+  .tooltip-trigger-left .tooltip-left,
+  .tooltip-trigger-top .tooltip-top,
+  .tooltip-trigger-right .tooltip-right,
+  .upload-tooltip {
+    display: none !important;
+  }
+  
+  /* Disable tooltip hover effects on mobile */
+  .tooltip-trigger:hover .tooltip,
+  .tooltip-trigger-left:hover .tooltip-left,
+  .tooltip-trigger-top:hover .tooltip-top,
+  .tooltip-trigger-right:hover .tooltip-right {
+    opacity: 0 !important;
+    visibility: hidden !important;
   }
 
   .sidebar-title {
