@@ -258,8 +258,11 @@ export const exportVideo = async (options: VideoExportOptions): Promise<void> =>
   
   console.log(`📹 Using codec: ${selectedCodec} → .${fileExtension}`);
 
-  // Create MediaRecorder
-  const stream = exportCanvas.captureStream(fps);
+  // Create MediaRecorder with canvas stream
+  // Note: captureStream(0) means manual frame capture (we'll call requestFrame)
+  // This gives us more control over when frames are captured
+  const stream = exportCanvas.captureStream(0); // 0 = manual mode
+  const videoTrack = stream.getVideoTracks()[0];
   
   const mediaRecorder = new MediaRecorder(stream, {
     mimeType: selectedCodec,
@@ -300,6 +303,9 @@ export const exportVideo = async (options: VideoExportOptions): Promise<void> =>
   mediaRecorder.start(100);
   console.log(`🎥 MediaRecorder started (state: ${mediaRecorder.state})`);
 
+  // Wait a bit for MediaRecorder to fully initialize
+  await new Promise(resolve => setTimeout(resolve, 100));
+  
   // Render each frame
   for (let frame = 0; frame < totalFrames; frame++) {
     const time = (frame / totalFrames) * duration;
@@ -337,6 +343,12 @@ export const exportVideo = async (options: VideoExportOptions): Promise<void> =>
 
     // Render scene
     exportRenderer.render(scene, exportCamera);
+
+    // Manually request frame capture from the canvas stream
+    // This is critical for captureStream(0) mode
+    if (videoTrack && typeof videoTrack.requestFrame === 'function') {
+      videoTrack.requestFrame();
+    }
 
     // Update progress
     const progress = ((frame + 1) / totalFrames) * 100;
