@@ -301,10 +301,20 @@ export const exportVideo = async (options: VideoExportOptions): Promise<void> =>
   // Start recording
   // Request data every 100ms to avoid losing chunks
   mediaRecorder.start(100);
-  console.log(`🎥 MediaRecorder started (state: ${mediaRecorder.state})`);
+  console.log(`🎥 MediaRecorder start requested (state: ${mediaRecorder.state})`);
 
-  // Wait a bit for MediaRecorder to fully initialize
-  await new Promise(resolve => setTimeout(resolve, 100));
+  // Wait for MediaRecorder to fully initialize and be ready to capture
+  // First export needs more time for browser to warm up the encoder
+  await new Promise(resolve => setTimeout(resolve, 500));
+  
+  // Verify it's actually recording
+  if (mediaRecorder.state !== 'recording') {
+    console.warn(`⚠️ MediaRecorder not in recording state: ${mediaRecorder.state}`);
+    // Wait a bit more
+    await new Promise(resolve => setTimeout(resolve, 300));
+  }
+  
+  console.log(`🎥 MediaRecorder ready (state: ${mediaRecorder.state})`);
   
   // Render each frame
   for (let frame = 0; frame < totalFrames; frame++) {

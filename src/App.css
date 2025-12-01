@@ -78,7 +78,7 @@ body {
 }
 
 .sidebar-header {
-  padding: 2rem 1.5rem;
+  padding: 1rem 1rem;
   border-bottom: 1px solid hsl(var(--border));
   display: flex;
   align-items: center;
@@ -345,7 +345,7 @@ body {
 
 .sidebar-content {
   flex: 1;
-  padding: 2rem 1.5rem;
+  padding: 1rem;
 }
 
 .sidebar-footer {

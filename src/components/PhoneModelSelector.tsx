@@ -34,7 +34,6 @@ export const PhoneModelSelector: React.FC<PhoneModelSelectorProps> = ({
 
   return (
     <div className="phone-model-selector">
-      <label className="phone-model-label">Device Model</label>
       <div className="phone-model-cards">
         {PHONE_MODELS.map((model) => (
           <button
