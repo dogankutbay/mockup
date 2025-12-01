@@ -304,14 +304,16 @@ export const exportVideo = async (options: VideoExportOptions): Promise<void> =>
   console.log(`🎥 MediaRecorder start requested (state: ${mediaRecorder.state})`);
 
   // Wait for MediaRecorder to fully initialize and be ready to capture
-  // First export needs more time for browser to warm up the encoder
-  await new Promise(resolve => setTimeout(resolve, 500));
+  // Longer delay needed when screen recording software (QuickTime, OBS, etc.) 
+  // is competing for video encoder resources
+  await new Promise(resolve => setTimeout(resolve, 1000));
   
   // Verify it's actually recording
   if (mediaRecorder.state !== 'recording') {
     console.warn(`⚠️ MediaRecorder not in recording state: ${mediaRecorder.state}`);
-    // Wait a bit more
-    await new Promise(resolve => setTimeout(resolve, 300));
+    console.warn(`   This may happen if screen recording software is using the encoder`);
+    // Wait even more for encoder to become available
+    await new Promise(resolve => setTimeout(resolve, 500));
   }
   
   console.log(`🎥 MediaRecorder ready (state: ${mediaRecorder.state})`);
