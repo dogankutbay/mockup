@@ -142,6 +142,14 @@ export const exportVideo = async (options: VideoExportOptions): Promise<void> =>
     onProgress,
   } = options;
 
+  // Validate inputs
+  if (keyframes.length === 0) {
+    throw new Error('Cannot export video: No keyframes added. Add at least 2 keyframes to create animation.');
+  }
+  if (keyframes.length === 1) {
+    console.warn('⚠️ Only 1 keyframe - video will be static (no animation)');
+  }
+
   const { width: exportWidth, height: exportHeight } = getExportDimensions(aspectRatio);
   const totalFrames = Math.ceil(duration * fps);
   
@@ -263,21 +271,34 @@ export const exportVideo = async (options: VideoExportOptions): Promise<void> =>
   mediaRecorder.ondataavailable = (e) => {
     if (e.data.size > 0) {
       chunks.push(e.data);
+      console.log(`📦 Chunk received: ${(e.data.size / 1024).toFixed(2)} KB (total: ${chunks.length})`);
+    } else {
+      console.warn('⚠️ Received empty chunk');
     }
   };
 
   const recordingPromise = new Promise<Blob>((resolve, reject) => {
     mediaRecorder.onstop = () => {
+      console.log(`🎬 Recording stopped. Total chunks: ${chunks.length}`);
+      if (chunks.length === 0) {
+        console.error('❌ No video data was recorded!');
+        reject(new Error('No video data was recorded. Try adding more keyframes or increasing duration.'));
+        return;
+      }
       const blob = new Blob(chunks, { type: mimeType });
+      console.log(`📦 Final blob size: ${(blob.size / 1024 / 1024).toFixed(2)} MB`);
       resolve(blob);
     };
     mediaRecorder.onerror = (e) => {
+      console.error('❌ MediaRecorder error:', e);
       reject(e);
     };
   });
 
   // Start recording
-  mediaRecorder.start();
+  // Request data every 100ms to avoid losing chunks
+  mediaRecorder.start(100);
+  console.log(`🎥 MediaRecorder started (state: ${mediaRecorder.state})`);
 
   // Render each frame
   for (let frame = 0; frame < totalFrames; frame++) {
@@ -321,17 +342,21 @@ export const exportVideo = async (options: VideoExportOptions): Promise<void> =>
     const progress = ((frame + 1) / totalFrames) * 100;
     onProgress(progress);
 
-    // Small delay for MediaRecorder
-    await new Promise(resolve => setTimeout(resolve, 16));
+    // Delay for MediaRecorder to capture the frame
+    // Use 1000/fps to match the target frame rate
+    const frameDelay = 1000 / fps;
+    await new Promise(resolve => setTimeout(resolve, frameDelay));
   }
 
   // Stop recording
+  console.log(`🛑 Stopping MediaRecorder (state: ${mediaRecorder.state})`);
   mediaRecorder.stop();
   
   // Restore scene background immediately so the live view isn't affected
   scene.background = originalBackground;
 
-  // Wait for blob (this can take a moment)
+  // Wait for blob (this can take a moment as the encoder finalizes)
+  console.log('⏳ Waiting for video encoding to complete...');
   const videoBlob = await recordingPromise;
 
   // Clean up export resources
@@ -339,6 +364,10 @@ export const exportVideo = async (options: VideoExportOptions): Promise<void> =>
   exportRenderer.dispose();
 
   // Download
+  if (videoBlob.size === 0) {
+    throw new Error('Video export failed: 0 KB file generated. Check console for details.');
+  }
+  
   const url = URL.createObjectURL(videoBlob);
   const a = document.createElement('a');
   a.href = url;
