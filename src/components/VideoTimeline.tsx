@@ -6,6 +6,12 @@
 import React, { useState } from 'react';
 import { FaPlay, FaPause, FaPlus, FaUndo, FaCheck, FaChevronDown } from 'react-icons/fa';
 
+// Detect Safari browser
+const isSafari = (): boolean => {
+  const userAgent = navigator.userAgent.toLowerCase();
+  return /safari/.test(userAgent) && !/chrome/.test(userAgent) && !/chromium/.test(userAgent);
+};
+
 export type EasingType = 'ease-in' | 'ease-out' | 'ease-in-out' | 'bouncy' | 'soft-bouncy' | 'gentle';
 
 export interface Keyframe {
@@ -328,13 +334,17 @@ export const VideoTimeline: React.FC<VideoTimelineProps> = ({
         </div>
         <label 
           className="transparent-checkbox"
-          data-tooltip="During rendering background will turn black, it's fine"
+          data-tooltip={
+            isSafari() 
+              ? "Safari does not support exporting transparent video" 
+              : "During rendering background will turn black, it's fine"
+          }
         >
           <input
             type="checkbox"
             checked={transparentBackground}
             onChange={(e) => onTransparentBackgroundChange(e.target.checked)}
-            disabled={disabled || isRecording || isExporting}
+            disabled={disabled || isRecording || isExporting || isSafari()}
           />
           <span>Transparent background</span>
         </label>

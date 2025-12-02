@@ -70,6 +70,17 @@ function App() {
   const videoCameraStateRef = useRef<CameraState | null>(null);
   const lastModelIdRef = useRef<string>(selectedModel.id);
 
+  // Detect Safari and disable transparent background if enabled
+  useEffect(() => {
+    const isSafari = /safari/.test(navigator.userAgent.toLowerCase()) && 
+                     !/chrome/.test(navigator.userAgent.toLowerCase()) && 
+                     !/chromium/.test(navigator.userAgent.toLowerCase());
+    
+    if (isSafari && transparentBackground) {
+      setTransparentBackground(false);
+    }
+  }, []); // Only run once on mount
+
   // Initialize Three.js scene
   const { sceneObjects, setControlsForVideoMode } = useThreeScene(mountRef);
   
