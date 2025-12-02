@@ -4,6 +4,7 @@
  */
 
 import React, { useRef, useState, useEffect } from 'react';
+import { Analytics } from '@vercel/analytics/react';
 import * as THREE from 'three';
 import { PhoneViewer } from './components/PhoneViewer';
 import { ControlPanel } from './components/ControlPanel';
@@ -697,6 +698,7 @@ function App() {
           </div>
         )}
       </main>
+      <Analytics />
     </div>
   );
 }
