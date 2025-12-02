@@ -180,12 +180,22 @@ export const exportVideo = async (options: VideoExportOptions): Promise<void> =>
     alpha: true, // Always enable alpha buffer
     antialias: true,
     preserveDrawingBuffer: true,
-    premultipliedAlpha: false, // Important for proper transparency in video
+    premultipliedAlpha: false, // Critical: false = proper transparency, true = black background
   });
   exportRenderer.setSize(exportWidth, exportHeight);
   exportRenderer.setPixelRatio(1);
   exportRenderer.toneMapping = THREE.NoToneMapping;
   exportRenderer.toneMappingExposure = 1.0;
+  
+  // Verify WebGL context has alpha enabled
+  const gl = exportRenderer.getContext();
+  if (gl) {
+    const hasAlpha = gl.getContextAttributes()?.alpha ?? false;
+    console.log(`🎨 WebGL alpha channel: ${hasAlpha ? '✅ Enabled' : '❌ Disabled'}`);
+    if (!hasAlpha && transparentBackground) {
+      console.warn('⚠️ WARNING: Alpha channel not available - transparency may not work!');
+    }
+  }
 
   // Clone camera for export
   const exportCamera = camera.clone();
@@ -215,13 +225,20 @@ export const exportVideo = async (options: VideoExportOptions): Promise<void> =>
   if (transparentBackground) {
     // Temporarily remove scene background for transparent export
     scene.background = null;
-    exportRenderer.setClearColor(0x000000, 0);
+    // Set clear color to fully transparent (black with 0 alpha)
+    exportRenderer.setClearColor(0x000000, 0); // alpha = 0 = fully transparent
     exportRenderer.autoClear = true;
-    console.log('🔍 Transparent mode: clearColor=(0,0,0,0)');
+    
+    // Force clear the canvas with transparent color before rendering
+    exportRenderer.clear(true, true, true); // color, depth, stencil
+    
+    console.log('🔍 Transparent mode: clearColor=(0,0,0,0), scene.background=null');
+    console.log('   WebM VP9 codec should preserve alpha channel');
   } else {
     // Use the user's selected background color
     scene.background = new THREE.Color(backgroundColor);
     exportRenderer.setClearColor(new THREE.Color(backgroundColor), 1);
+    console.log(`🎨 Solid background: ${backgroundColor}`);
   }
 
   // Determine file format
@@ -257,6 +274,15 @@ export const exportVideo = async (options: VideoExportOptions): Promise<void> =>
   const mimeType = isMP4 ? 'video/mp4' : 'video/webm';
   
   console.log(`📹 Using codec: ${selectedCodec} → .${fileExtension}`);
+  
+  // Warn if transparent but not using VP9
+  if (transparentBackground && !selectedCodec.includes('vp9')) {
+    console.warn('⚠️ WARNING: Transparent export but VP9 codec not available!');
+    console.warn('   Transparency may not work correctly. Alpha channel requires VP9 codec.');
+    console.warn(`   Available codec: ${selectedCodec}`);
+  } else if (transparentBackground && selectedCodec.includes('vp9')) {
+    console.log('✅ Transparent export: VP9 codec confirmed - alpha channel will be preserved');
+  }
 
   // Create MediaRecorder with canvas stream
   // Note: captureStream(0) means manual frame capture (we'll call requestFrame)
@@ -323,8 +349,9 @@ export const exportVideo = async (options: VideoExportOptions): Promise<void> =>
     const time = (frame / totalFrames) * duration;
     
     // Clear the canvas for transparent exports
+    // Must clear with transparent color, not default black
     if (transparentBackground) {
-      exportRenderer.clear();
+      exportRenderer.clear(true, true, true); // Clear color, depth, and stencil buffers
     }
     
     // Get interpolated camera state
