@@ -5,8 +5,8 @@ import './index.css'
 import { AppRouter } from './AppRouter.tsx'
 
 createRoot(document.getElementById('root')!).render(
-  <StrictMode>
+  <>
     <AppRouter />
     <SpeedInsights />
-  </StrictMode>
+  </>
 )

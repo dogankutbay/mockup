@@ -55,7 +55,10 @@ function App({ initialModel }: AppProps = {}) {
   const mountRef = useRef<HTMLDivElement>(null);
   const uploadButtonRef = useRef<HTMLButtonElement | null>(null);
   const [error, setError] = useState<AppError | null>(null);
-  const [selectedModel, setSelectedModel] = useState<PhoneModelConfig>(initialModel || DEFAULT_PHONE_MODEL);
+  // Ensure we always have a valid model - use initialModel if provided, otherwise default
+  const [selectedModel, setSelectedModel] = useState<PhoneModelConfig>(
+    initialModel || DEFAULT_PHONE_MODEL
+  );
   const [cameraPos, setCameraPos] = useState({ x: 0, y: 0, z: 10 });
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileExpanded, setMobileExpanded] = useState(false);
@@ -72,7 +75,7 @@ function App({ initialModel }: AppProps = {}) {
     if (initialModel && initialModel.id !== selectedModel.id) {
       setSelectedModel(initialModel);
     }
-  }, [initialModel]);
+  }, [initialModel?.id]); // Only depend on the model ID, not the whole object
 
   const [frameZoom, setFrameZoom] = useState(0.7); // Default 70% of max viewport size
   const [frameAspectRatio, setFrameAspectRatio] = useState<FrameAspectRatio>('square');

@@ -8,4 +8,11 @@ export default defineConfig({
     host: true, // Allow access from network
     port: 5173,
   },
+  build: {
+    // Remove console logs in production
+    minify: 'esbuild',
+    esbuild: {
+      drop: ['console', 'debugger'], // Remove console.log, console.warn, etc. in production
+    },
+  },
 })
