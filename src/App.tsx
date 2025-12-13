@@ -4,6 +4,7 @@
  */
 
 import React, { useRef, useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Analytics } from '@vercel/analytics/react';
 import * as THREE from 'three';
 import { PhoneViewer } from './components/PhoneViewer';
@@ -40,15 +41,21 @@ import { useTheme } from './hooks/useTheme';
 import { exportCanvasAsImage } from './utils/exportUtils';
 import { exportVideo } from './utils/videoExport';
 import { DEFAULT_PHONE_MODEL } from './config/phoneModels';
+import { getRouteByModelId } from './config/routes';
 import type { AppError } from './types';
 import type { PhoneModelConfig } from './config/phoneModels';
 import './App.css';
 
-function App() {
+interface AppProps {
+  initialModel?: PhoneModelConfig;
+}
+
+function App({ initialModel }: AppProps = {}) {
+  const navigate = useNavigate();
   const mountRef = useRef<HTMLDivElement>(null);
   const uploadButtonRef = useRef<HTMLButtonElement | null>(null);
   const [error, setError] = useState<AppError | null>(null);
-  const [selectedModel, setSelectedModel] = useState<PhoneModelConfig>(DEFAULT_PHONE_MODEL);
+  const [selectedModel, setSelectedModel] = useState<PhoneModelConfig>(initialModel || DEFAULT_PHONE_MODEL);
   const [cameraPos, setCameraPos] = useState({ x: 0, y: 0, z: 10 });
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileExpanded, setMobileExpanded] = useState(false);
@@ -59,6 +66,13 @@ function App() {
   const sidebarRef = useRef<HTMLElement>(null);
   const { theme, setTheme } = useTheme();
   const [mode, setMode] = useState<AppMode>('picture');
+
+  // Update selected model when initialModel prop changes (route change)
+  useEffect(() => {
+    if (initialModel && initialModel.id !== selectedModel.id) {
+      setSelectedModel(initialModel);
+    }
+  }, [initialModel]);
 
   const [frameZoom, setFrameZoom] = useState(0.7); // Default 70% of max viewport size
   const [frameAspectRatio, setFrameAspectRatio] = useState<FrameAspectRatio>('square');
@@ -552,7 +566,14 @@ function App() {
         <div className="sidebar-content">
           <PhoneModelSelector
             selectedModel={selectedModel}
-            onModelChange={setSelectedModel}
+            onModelChange={(model) => {
+              setSelectedModel(model);
+              // Navigate to the route for this model
+              const route = getRouteByModelId(model.id);
+              if (route && route.path !== window.location.pathname) {
+                navigate(route.path, { replace: true });
+              }
+            }}
             disabled={isLoading}
           />
           

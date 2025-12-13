@@ -84,9 +84,36 @@ src/
 ## 📦 Available Scripts
 
 - `npm run dev` - Start development server
-- `npm run build` - Build for production
+- `npm run build` - Build for production (automatically generates sitemap.xml)
+- `npm run build:check` - Type check and build for production
 - `npm run preview` - Preview production build
 - `npm run lint` - Run ESLint
+- `npm run generate-sitemap` - Generate sitemap.xml manually
+
+## 🔍 SEO Features
+
+### Sitemap Generation
+
+The build process automatically generates a `sitemap.xml` file in the `dist` folder. This includes all routes defined in `src/config/routes.ts`.
+
+**Automatic Vercel Detection:**
+When deploying to Vercel, the sitemap automatically uses the deployment URL - no configuration needed! The script detects `VERCEL_URL` during the build.
+
+**For Custom Domains:**
+If you have a custom domain on Vercel, set the `SITE_URL` environment variable in your Vercel project settings:
+1. Go to Project Settings → Environment Variables
+2. Add `SITE_URL` with your custom domain (e.g., `https://yourdomain.com`)
+
+The sitemap will be available at `https://yourdomain.com/sitemap.xml` after deployment.
+
+### SEO-Friendly URLs
+
+Each phone model has its own SEO-optimized URL:
+- `/iphone-3d-mockup` - iPhone mockup generator
+- `/android-3d-mockup` - Android mockup generator
+- `/` - Homepage
+
+Each page has unique meta tags (title, description, keywords) for better SEO.
 
 ## 🎨 Customization
 
