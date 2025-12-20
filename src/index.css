@@ -94,6 +94,42 @@
   --success-border: 80 100% 45%; /* Brighter green border */
   --success-foreground: 80 100% 70%; /* Lighter green text */
   --success-bg-hover: 80 50% 25%; /* Slightly lighter hover */
+  
+  /* Badge colors - Dark theme */
+  --badge-neutral: 0 0% 85%; /* Light gray */
+  --badge-neutral-foreground: 0 0% 9%; /* Dark text */
+  --badge-neutral-variant: 0 0% 20%; /* Dark gray background */
+  --badge-neutral-variant-foreground: 0 0% 85%; /* Light text */
+  
+  --badge-dark: 0 0% 100%; /* White */
+  --badge-dark-foreground: 0 0% 9%; /* Dark text */
+  --badge-dark-variant: 0 0% 25%; /* Light gray background */
+  --badge-dark-variant-foreground: 0 0% 95%; /* Light text */
+  
+  --badge-info: 217 91% 65%; /* Lighter blue */
+  --badge-info-foreground: 0 0% 9%; /* Dark text */
+  --badge-info-variant: 217 91% 20%; /* Dark blue background */
+  --badge-info-variant-foreground: 217 91% 75%; /* Light blue text */
+  
+  --badge-warning: 25 95% 60%; /* Lighter orange */
+  --badge-warning-foreground: 0 0% 9%; /* Dark text */
+  --badge-warning-variant: 25 95% 20%; /* Dark orange background */
+  --badge-warning-variant-foreground: 25 95% 70%; /* Light orange text */
+  
+  --badge-promotion: 52 98% 58%; /* Lighter yellow */
+  --badge-promotion-foreground: 0 0% 9%; /* Dark text */
+  --badge-promotion-variant: 52 98% 20%; /* Dark yellow background */
+  --badge-promotion-variant-foreground: 52 98% 70%; /* Light yellow text */
+  
+  --badge-error: 0 72% 55%; /* Lighter red */
+  --badge-error-foreground: 0 0% 100%; /* White text */
+  --badge-error-variant: 0 72% 20%; /* Dark red background */
+  --badge-error-variant-foreground: 0 72% 75%; /* Light red text */
+  
+  --badge-success: 142 76% 50%; /* Lighter green */
+  --badge-success-foreground: 0 0% 9%; /* Dark text */
+  --badge-success-variant: 142 76% 20%; /* Dark green background */
+  --badge-success-variant-foreground: 142 76% 70%; /* Light green text */
 
   color-scheme: dark;
 }
@@ -158,6 +194,42 @@
   --success-border: 80 100% 32%; /* #5ea500 - Success border */
   --success-foreground: 80 100% 22%; /* #3f6e00 - Success text */
   --success-bg-hover: 80 50% 90%; /* #e7f3d3 - Success hover */
+  
+  /* Badge colors - Light theme */
+  --badge-neutral: 0 0% 9%; /* Dark gray */
+  --badge-neutral-foreground: 0 0% 98%; /* Light text */
+  --badge-neutral-variant: 0 0% 96%; /* Light gray background */
+  --badge-neutral-variant-foreground: 0 0% 20%; /* Dark text */
+  
+  --badge-dark: 0 0% 0%; /* Black */
+  --badge-dark-foreground: 0 0% 100%; /* White text */
+  --badge-dark-variant: 0 0% 15%; /* Dark gray background */
+  --badge-dark-variant-foreground: 0 0% 95%; /* Light text */
+  
+  --badge-info: 217 91% 60%; /* Blue */
+  --badge-info-foreground: 0 0% 100%; /* White text */
+  --badge-info-variant: 217 91% 95%; /* Light blue background */
+  --badge-info-variant-foreground: 217 91% 35%; /* Dark blue text */
+  
+  --badge-warning: 25 95% 53%; /* Orange */
+  --badge-warning-foreground: 0 0% 100%; /* White text */
+  --badge-warning-variant: 25 95% 95%; /* Light orange background */
+  --badge-warning-variant-foreground: 25 95% 30%; /* Dark orange text */
+  
+  --badge-promotion: 52 98% 50%; /* Yellow */
+  --badge-promotion-foreground: 0 0% 9%; /* Dark text */
+  --badge-promotion-variant: 52 98% 95%; /* Light yellow background */
+  --badge-promotion-variant-foreground: 52 98% 25%; /* Dark yellow text */
+  
+  --badge-error: 0 84.2% 60.2%; /* Red */
+  --badge-error-foreground: 0 0% 100%; /* White text */
+  --badge-error-variant: 0 84.2% 96%; /* Light red background */
+  --badge-error-variant-foreground: 0 84.2% 35%; /* Dark red text */
+  
+  --badge-success: 142 76% 36%; /* Green */
+  --badge-success-foreground: 0 0% 100%; /* White text */
+  --badge-success-variant: 142 76% 96%; /* Light green background */
+  --badge-success-variant-foreground: 142 76% 25%; /* Dark green text */
 }
 
 /* Light contrast theme additional variables */
@@ -184,6 +256,42 @@
   --success-border: 80 100% 32%; /* #5ea500 - Success border */
   --success-foreground: 80 100% 22%; /* #3f6e00 - Success text */
   --success-bg-hover: 80 50% 90%; /* #e7f3d3 - Success hover */
+  
+  /* Badge colors - Light contrast theme */
+  --badge-neutral: 0 0% 5%; /* Darker gray */
+  --badge-neutral-foreground: 0 0% 98%; /* Light text */
+  --badge-neutral-variant: 0 0% 92%; /* Light gray background */
+  --badge-neutral-variant-foreground: 0 0% 25%; /* Dark text */
+  
+  --badge-dark: 0 0% 0%; /* Black */
+  --badge-dark-foreground: 0 0% 100%; /* White text */
+  --badge-dark-variant: 0 0% 12%; /* Dark gray background */
+  --badge-dark-variant-foreground: 0 0% 95%; /* Light text */
+  
+  --badge-info: 217 91% 55%; /* Slightly darker blue */
+  --badge-info-foreground: 0 0% 100%; /* White text */
+  --badge-info-variant: 217 91% 92%; /* Light blue background */
+  --badge-info-variant-foreground: 217 91% 30%; /* Dark blue text */
+  
+  --badge-warning: 25 95% 50%; /* Slightly darker orange */
+  --badge-warning-foreground: 0 0% 100%; /* White text */
+  --badge-warning-variant: 25 95% 92%; /* Light orange background */
+  --badge-warning-variant-foreground: 25 95% 28%; /* Dark orange text */
+  
+  --badge-promotion: 52 98% 48%; /* Slightly darker yellow */
+  --badge-promotion-foreground: 0 0% 5%; /* Dark text */
+  --badge-promotion-variant: 52 98% 92%; /* Light yellow background */
+  --badge-promotion-variant-foreground: 52 98% 22%; /* Dark yellow text */
+  
+  --badge-error: 0 84.2% 58%; /* Slightly darker red */
+  --badge-error-foreground: 0 0% 100%; /* White text */
+  --badge-error-variant: 0 84.2% 94%; /* Light red background */
+  --badge-error-variant-foreground: 0 84.2% 32%; /* Dark red text */
+  
+  --badge-success: 142 76% 33%; /* Slightly darker green */
+  --badge-success-foreground: 0 0% 100%; /* White text */
+  --badge-success-variant: 142 76% 94%; /* Light green background */
+  --badge-success-variant-foreground: 142 76% 22%; /* Dark green text */
 }
 
 body {

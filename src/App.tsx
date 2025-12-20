@@ -689,7 +689,7 @@ function App({ initialModel }: AppProps = {}) {
         </button>
         
         <div className="sidebar-header">
-          <h2 className="sidebar-title">Camera Position</h2>
+          <h2 className="sidebar-title">Camera Position <span className="badge badge-small badge-promotion">NEW</span></h2>
         </div>
 
         <div className="sidebar-content">

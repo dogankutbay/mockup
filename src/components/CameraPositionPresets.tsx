@@ -4,7 +4,7 @@
  */
 
 import React, { useState } from 'react';
-import { FaChevronDown, FaChevronUp } from 'react-icons/fa';
+import { FaChevronDown } from 'react-icons/fa';
 
 // Import all preset icons
 import flatWebp from '../assets/presetIcons/webp/flat.webp';
@@ -284,9 +284,11 @@ export const CameraPositionPresets: React.FC<CameraPositionPresetsProps> = ({
         aria-label={isExpanded ? 'Collapse position presets' : 'Expand position presets'}
       >
         <label className="camera-presets-label">Position Presets</label>
-        {isExpanded ? <FaChevronUp /> : <FaChevronDown />}
+        <span className={`camera-presets-chevron ${isExpanded ? 'expanded' : ''}`}>
+          <FaChevronDown />
+        </span>
       </button>
-      {isExpanded && (
+      <div className={`camera-presets-content ${isExpanded ? 'expanded' : ''}`}>
         <div className="camera-presets-grid">
           {CAMERA_PRESETS.map((preset, index) => {
             const isActive = isPresetActive(preset);
@@ -318,7 +320,7 @@ export const CameraPositionPresets: React.FC<CameraPositionPresetsProps> = ({
             );
           })}
         </div>
-      )}
+      </div>
     </div>
   );
 };
