@@ -13,6 +13,8 @@ export { PhoneModelSelector } from './PhoneModelSelector';
 export { ResolutionInfo } from './ResolutionInfo';
 export { CameraControls } from './CameraControls';
 export { CameraSliders } from './CameraSliders';
+export { CameraPositionPresets, CAMERA_PRESETS } from './CameraPositionPresets';
+export type { CameraPreset } from './CameraPositionPresets';
 export { ScreenshotGallery } from './ScreenshotGallery';
 export { ModeToggle } from './ModeToggle';
 export { VideoTimeline } from './VideoTimeline';

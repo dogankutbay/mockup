@@ -27,6 +27,7 @@
   --input: 214.3 31.8% 91.4%;
   --ring: 222.2 84% 4.9%;
   --radius: 0.5rem;
+  --radius-small: 0.35rem;
 }
 
 .theme-light-contrast {
@@ -47,6 +48,7 @@
   --input: 214.3 31.8% 80%;
   --ring: 222.2 84% 2%;
   --radius: 0.5rem;
+  --radius-small: 0.35rem;
 }
 
 .theme-dark {
@@ -67,6 +69,7 @@
   --input: 0 0% 15%; /* Slightly lighter than background */
   --ring: 212.7 26.8% 83.9%;
   --radius: 0.5rem;
+  --radius-small: 0.35rem;
 
   /* Additional color variables for dark theme */
   --video-mode-bg: 0 0% 2%; /* Same dark background for video mode */
@@ -95,13 +98,31 @@
   color-scheme: dark;
 }
 
+/* Geist Sans font faces */
+@font-face {
+  font-family: 'Geist Sans';
+  src: url('/fonts/Geist-Variable.woff2') format('woff2');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Geist Mono font faces */
+@font-face {
+  font-family: 'Geist Mono';
+  src: url('/fonts/GeistMono-Variable.woff2') format('woff2');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
 /* Shared additional color variables for all themes */
 :root,
 .theme-light,
 .theme-light-contrast,
 .theme-dark {
   /* These are shared across all themes */
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+  font-family: 'Geist Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
     sans-serif;
   line-height: 1.5;
@@ -171,6 +192,11 @@ body {
   min-height: 100vh;
   color: hsl(var(--foreground));
   background: hsl(var(--background));
+}
+
+/* Ensure buttons inherit Geist font */
+button {
+  font-family: inherit;
 }
 
 #root {

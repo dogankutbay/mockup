@@ -4,7 +4,6 @@
 
 body {
   margin: 0;
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   background-color: hsl(var(--background));
   color: hsl(var(--foreground));
 }
@@ -42,6 +41,17 @@ body {
   transform: translateX(-100%);
 }
 
+.sidebar-right {
+  left: auto !important;
+  right: 0 !important;
+  border-right: none;
+  border-left: 1px solid hsl(var(--border));
+}
+
+.sidebar-right.collapsed {
+  transform: translateX(100%);
+}
+
 /* Sidebar Toggle Button */
 .sidebar-toggle {
   position: absolute;
@@ -52,7 +62,7 @@ body {
   height: 2rem;
   background: hsl(var(--background));
   border: 1px solid hsl(var(--border));
-  border-radius:var(--radius);
+  border-radius: var(--radius);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -62,10 +72,19 @@ body {
   z-index: 1;
 }
 
+.sidebar-toggle-right {
+  right: auto;
+  left: -1rem;
+}
+
 .sidebar.collapsed {
  .sidebar-toggle{
   right: -1.75em;
  }
+}
+
+.sidebar-right.collapsed .sidebar-toggle-right {
+  left: -1.75em;
 }
 
 .sidebar-toggle:hover {
@@ -85,6 +104,14 @@ body {
   gap: 1rem;
 }
 
+.sidebar-right .sidebar-header {
+  justify-content: center;
+}
+
+.sidebar-right .sidebar-title {
+  font-size: 1.25rem;
+}
+
 .sidebar-header img {
   width: 48px;
   height: 48px;
@@ -101,12 +128,14 @@ body {
 }
 
 /* Tooltip - shadcn style */
-.tooltip-trigger {
+.tooltip-trigger,
+.tooltip-trigger-right {
   position: relative;
   cursor: help;
 }
 
-.tooltip {
+.tooltip,
+.tooltip-right {
   position: absolute;
   left: 100%;
   top: 50%;
@@ -126,7 +155,8 @@ body {
   margin-left: 0.5rem;
 }
 
-.tooltip::after {
+.tooltip::after,
+.tooltip-right::after {
   content: '';
   position: absolute;
   right: 100%;
@@ -136,7 +166,8 @@ body {
   border-right-color: hsl(var(--primary));
 }
 
-.tooltip-trigger:hover .tooltip {
+.tooltip-trigger:hover .tooltip,
+.tooltip-trigger-right:hover .tooltip-right {
   opacity: 1;
   transform: translateY(-50%) translateX(12px);
 }
@@ -144,7 +175,7 @@ body {
 /* Tooltip Left - for right-side elements */
 .tooltip-trigger-left {
   position: relative;
-  cursor: help;
+  cursor: pointer;
 }
 
 .tooltip-left {
@@ -180,6 +211,47 @@ body {
 .tooltip-trigger-left:hover .tooltip-left {
   opacity: 1;
   transform: translateY(-50%) translateX(-12px);
+}
+
+/* Compact Tooltip Left - smaller version for small buttons */
+.tooltip-trigger-left-compact {
+  position: relative;
+  cursor: pointer;
+}
+
+.tooltip-left-compact {
+  position: absolute;
+  right: 100%;
+  top: 50%;
+  transform: translateY(-50%) translateX(-4px);
+  padding: 0.25rem 0.5rem;
+  background: hsl(var(--primary));
+  color: hsl(var(--primary-foreground));
+  font-size: 0.75rem;
+  font-weight: 400;
+  border-radius: calc(var(--radius) - 2px);
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+  z-index: 1000;
+  box-shadow: 0 2px 4px -1px rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+  margin-right: 0.25rem;
+}
+
+.tooltip-left-compact::after {
+  content: '';
+  position: absolute;
+  left: 100%;
+  top: 50%;
+  transform: translateY(-50%);
+  border: 4px solid transparent;
+  border-left-color: hsl(var(--primary));
+}
+
+.tooltip-trigger-left-compact:hover .tooltip-left-compact {
+  opacity: 1;
+  transform: translateY(-50%) translateX(-6px);
 }
 
 /* Tooltip Top - for elements that need tooltip above */
@@ -223,46 +295,47 @@ body {
   transform: translateX(-50%) translateY(-12px);
 }
 
-/* Tooltip Right - for left-side elements */
-.tooltip-trigger-right {
+/* Compact Tooltip Top - smaller version for small buttons */
+.tooltip-trigger-top-compact {
   position: relative;
   cursor: pointer;
 }
 
-.tooltip-right {
+.tooltip-top-compact {
   position: absolute;
-  left: 100%;
-  top: 50%;
-  transform: translateY(-50%) translateX(8px);
-  padding: 0.5rem 0.75rem;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%) translateY(-4px);
+  padding: 0.25rem 0.5rem;
   background: hsl(var(--primary));
   color: hsl(var(--primary-foreground));
-  font-size: 0.875rem;
-  font-weight: 500;
-  border-radius: var(--radius);
+  font-size: 0.75rem;
+  font-weight: 400;
+  border-radius: calc(var(--radius) - 2px);
   white-space: nowrap;
   pointer-events: none;
   opacity: 0;
   transition: opacity 0.15s ease, transform 0.15s ease;
   z-index: 1000;
-  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-  margin-left: 0.5rem;
+  box-shadow: 0 2px 4px -1px rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+  margin-bottom: 0.25rem;
 }
 
-.tooltip-right::after {
+.tooltip-top-compact::after {
   content: '';
   position: absolute;
-  right: 100%;
-  top: 50%;
-  transform: translateY(-50%);
-  border: 6px solid transparent;
-  border-right-color: hsl(var(--primary));
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 4px solid transparent;
+  border-top-color: hsl(var(--primary));
 }
 
-.tooltip-trigger-right:hover .tooltip-right {
+.tooltip-trigger-top-compact:hover .tooltip-top-compact {
   opacity: 1;
-  transform: translateY(-50%) translateX(12px);
+  transform: translateX(-50%) translateY(-6px);
 }
+
 
 /* Hide tooltip when tooltip-hidden class is present */
 .tooltip-trigger-top.tooltip-hidden .tooltip-top,
@@ -375,15 +448,25 @@ body {
 .app-main {
   flex: 1;
   margin-left: 320px;
+  margin-right: 320px;
   position: relative;
   display: flex;
   flex-direction: column;
-  transition: margin-left 0.3s ease;
+  transition: margin-left 0.3s ease, margin-right 0.3s ease;
   background: transparent;
 }
 
 .app-main.sidebar-collapsed {
   margin-left: 0;
+}
+
+.app-main.right-sidebar-collapsed {
+  margin-right: 0;
+}
+
+.app-main.sidebar-collapsed.right-sidebar-collapsed {
+  margin-left: 0;
+  margin-right: 0;
 }
 
 /* Phone Viewer */
@@ -414,17 +497,6 @@ body {
   gap: 1rem;
 }
 
-.control-panel-note {
-  margin: -0.5rem 0 0;
-  font-size: 0.8rem;
-  line-height: 1.4;
-  color: hsl(var(--muted-text));
-  text-align: center;
-  padding: 0.5rem;
-  background: hsl(var(--note-bg));
-  border-radius: 0.375rem;
-  border: 1px solid hsl(var(--note-border));
-}
 
 /* Screenshot Gallery */
 .screenshot-gallery {
@@ -548,6 +620,14 @@ body {
   padding-top: 1.5rem;
 }
 
+/* Phone Color Picker */
+.phone-color-picker {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding-top: 1.5rem;
+}
+
 .color-picker-label {
   font-size: 0.875rem;
   font-weight: 600;
@@ -632,7 +712,7 @@ body {
   font-size: 0.875rem;
   font-weight: 500;
   color: hsl(var(--foreground));
-  font-family: monospace;
+  font-family: 'Geist Mono', monospace;
   padding: 0.5rem;
   border: 1px solid hsl(var(--input));
   border-radius: calc(var(--radius) - 2px);
@@ -904,7 +984,7 @@ body {
   font-size: 0.75rem;
   font-weight: 500;
   color: hsl(var(--muted-foreground));
-  font-family: monospace;
+  font-family: 'Geist Mono', monospace;
 }
 
 /* Resolution Info - shadcn alert style */
@@ -943,7 +1023,7 @@ body {
 }
 
 .camera-slider-value {
-  font-family: monospace;
+  font-family: 'Geist Mono', monospace;
   font-size: 0.75rem;
   color: hsl(var(--muted-foreground));
   background: hsl(var(--muted));
@@ -1052,6 +1132,147 @@ body {
   opacity: 0.5;
 }
 
+/* Camera Position Presets */
+.camera-presets {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding-top: 1rem;
+}
+
+.camera-presets-label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: hsl(var(--foreground));
+}
+
+.camera-presets-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 0.5rem 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: hsl(var(--foreground));
+  transition: color 0.15s ease;
+}
+
+.camera-presets-header:hover {
+  color: hsl(var(--primary));
+}
+
+.camera-presets-header svg {
+  font-size: 0.75rem;
+  opacity: 0.7;
+  transition: opacity 0.15s ease;
+}
+
+.camera-presets-header:hover svg {
+  opacity: 1;
+}
+
+.camera-presets-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 0.25rem;
+  padding-right: 0.25rem;
+  padding-top: 0.5rem;
+}
+
+.camera-presets-grid::-webkit-scrollbar {
+  width: 6px;
+}
+
+.camera-presets-grid::-webkit-scrollbar-track {
+  background: hsl(var(--muted));
+  border-radius: 3px;
+}
+
+.camera-presets-grid::-webkit-scrollbar-thumb {
+  background: hsl(var(--muted-foreground) / 0.3);
+  border-radius: 3px;
+}
+
+.camera-presets-grid::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--muted-foreground) / 0.5);
+}
+
+.camera-preset-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 1;
+  width: 100%;
+  padding: 0.05rem;
+  border: 1px solid hsl(var(--input));
+  border-radius: var(--radius);
+  cursor: pointer;
+  background: hsl(var(--background));
+  color: hsl(var(--foreground));
+  position: relative;
+}
+
+
+.camera-preset-icon {
+  display: block;
+  width: 100%;
+  height: 100%;
+  flex-shrink: 0;
+}
+
+.camera-preset-icon-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+  border-radius: var(--radius-small);
+  mix-blend-mode: multiply;
+}
+
+.camera-preset-rectangle {
+  width: 100%;
+  height: 100%;
+  background: hsl(var(--muted));
+  border-radius: var(--radius-small);
+}
+
+
+.camera-preset-btn:hover:not(:disabled) {
+  background: hsl(var(--accent));
+  color: hsl(var(--accent-foreground));
+  border-color: hsl(var(--input));
+}
+
+
+.camera-preset-btn.active {
+  border-color: hsl(var(--muted-foreground));
+  border-width: 0.05rem;
+  background: hsl(var(--accent));
+}
+
+.camera-preset-btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px hsl(var(--background)), 0 0 0 4px hsl(var(--ring));
+}
+
+.camera-preset-btn:disabled {
+  pointer-events: none;
+  opacity: 0.5;
+}
+
+
+.camera-preset-name {
+  padding: 0.25rem;
+  transition: color 0.15s ease;
+}
+
+.camera-preset-name.active {
+  color: hsl(var(--primary));
+  font-weight: 500;
+}
+
 /* Theme Selector */
 .theme-selector {
   display: flex;
@@ -1127,9 +1348,8 @@ body {
   bottom: 2rem;
   left: 50%;
   transform: translateX(-50%);
-  z-index: 200;
-  transition: bottom 0.3s ease;
   z-index: 1;
+  transition: bottom 0.3s ease;
 }
 
 /* Move higher when video mode is active to avoid timeline bar */
@@ -1271,7 +1491,7 @@ body {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  font-family: monospace;
+  font-family: 'Geist Mono', monospace;
   font-size: 0.875rem;
 }
 
@@ -1303,7 +1523,7 @@ body {
 .video-duration-input {
   width: 4rem;
   padding: 0.25rem 0.5rem;
-  font-family: monospace;
+  font-family: 'Geist Mono', monospace;
   font-size: 0.875rem;
   font-weight: 600;
   text-align: center;
@@ -1717,7 +1937,7 @@ body {
 }
 
 .frame-zoom-percentage {
-  font-family: monospace;
+  font-family: 'Geist Mono', monospace;
   font-size: 0.875rem;
   font-weight: 600;
   color: hsl(var(--primary));
@@ -1792,6 +2012,20 @@ body {
 
   .app-main {
     margin-left: 280px;
+    margin-right: 280px;
+  }
+
+  .app-main.sidebar-collapsed {
+    margin-left: 0;
+  }
+
+  .app-main.right-sidebar-collapsed {
+    margin-right: 0;
+  }
+
+  .app-main.sidebar-collapsed.right-sidebar-collapsed {
+    margin-left: 0;
+    margin-right: 0;
   }
 
   .sidebar-title {
@@ -1824,13 +2058,6 @@ body {
   gap: 0.5rem;
 }
 
-.canvas-grab-cursor {
-  cursor: grab;
-}
-
-.canvas-grabbing-cursor {
-  cursor: grabbing;
-}
 
 /* Hide mobile expand indicator on desktop */
 .mobile-expand-indicator {
@@ -1966,11 +2193,18 @@ body {
 
   .app-main {
     margin-left: 0;
+    margin-right: 0;
     margin-bottom: 15vh; /* Add space for bottom sheet */
   }
 
-  .app-main.sidebar-collapsed {
+  .app-main.sidebar-collapsed,
+  .app-main.right-sidebar-collapsed,
+  .app-main.sidebar-collapsed.right-sidebar-collapsed {
     margin-bottom: 0;
+  }
+
+  .sidebar-right {
+    display: none; /* Hide right sidebar on mobile */
   }
 
   .app {

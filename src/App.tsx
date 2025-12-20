@@ -17,6 +17,7 @@ import { PhoneModelSelector } from './components/PhoneModelSelector';
 import { ResolutionInfo } from './components/ResolutionInfo';
 import { CameraControls } from './components/CameraControls';
 import { CameraSliders } from './components/CameraSliders';
+import { CameraPositionPresets, type CameraPreset } from './components/CameraPositionPresets';
 import { ScreenshotGallery } from './components/ScreenshotGallery';
 import { ModeToggle } from './components/ModeToggle';
 import { VideoTimeline } from './components/VideoTimeline';
@@ -61,6 +62,7 @@ function App({ initialModel }: AppProps = {}) {
   );
   const [cameraPos, setCameraPos] = useState({ x: 0, y: 0, z: 10 });
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [rightSidebarCollapsed, setRightSidebarCollapsed] = useState(false);
   const [mobileExpanded, setMobileExpanded] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [dragStartY, setDragStartY] = useState(0);
@@ -307,6 +309,52 @@ function App({ initialModel }: AppProps = {}) {
     
     // Update state immediately for slider feedback
     setCameraPos(prev => ({ ...prev, [axis]: value }));
+  };
+
+  // Handle preset selection with smooth animation
+  const handlePresetSelect = (preset: CameraPreset) => {
+    if (!sceneObjects?.camera || !sceneObjects?.controls) return;
+    
+    const { z } = cameraPos; // Keep current Z (zoom) value
+    const startX = sceneObjects.camera.position.x;
+    const startY = sceneObjects.camera.position.y;
+    const targetX = preset.x;
+    const targetY = preset.y;
+    
+    // Animation parameters
+    const duration = 500; // 0.5 seconds
+    const startTime = Date.now();
+    
+    // Easing function (ease-out cubic for smooth deceleration)
+    const easeOutCubic = (t: number): number => {
+      return 1 - Math.pow(1 - t, 3);
+    };
+    
+    // Animation loop
+    const animate = () => {
+      const elapsed = Date.now() - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      const easedProgress = easeOutCubic(progress);
+      
+      // Interpolate positions
+      const currentX = startX + (targetX - startX) * easedProgress;
+      const currentY = startY + (targetY - startY) * easedProgress;
+      
+      sceneObjects.camera.position.set(currentX, currentY, z);
+      sceneObjects.controls.target.set(0, 0, 0);
+      sceneObjects.controls.update();
+      
+      // Update state for UI feedback
+      setCameraPos({ x: currentX, y: currentY, z });
+      
+      // Continue animation if not complete
+      if (progress < 1) {
+        requestAnimationFrame(animate);
+      }
+    };
+    
+    // Start animation
+    animate();
   };
 
   // Export mockup as image
@@ -613,18 +661,6 @@ function App({ initialModel }: AppProps = {}) {
             disabled={isLoading}
           />
 
-          <CameraSliders
-            cameraPosition={cameraPos}
-            onPositionChange={handleSliderChange}
-            disabled={isLoading}
-          />
-
-          <CameraControls
-            onResetCamera={handleResetCamera}
-            onResetZoom={handleResetZoom}
-            disabled={isLoading}
-          />
-
           <ThemeSelector
             theme={theme}
             onThemeChange={setTheme}
@@ -640,7 +676,44 @@ function App({ initialModel }: AppProps = {}) {
         </div>
       </aside>
 
-      <main className={`app-main ${sidebarCollapsed ? 'sidebar-collapsed' : ''} ${mode === 'video' ? 'video-mode' : ''}`}>
+      {/* Right Sidebar for Camera Controls */}
+      <aside 
+        className={`sidebar sidebar-right ${rightSidebarCollapsed ? 'collapsed' : ''}`}
+      >
+        <button 
+          className="sidebar-toggle sidebar-toggle-right"
+          onClick={() => setRightSidebarCollapsed(!rightSidebarCollapsed)}
+          aria-label={rightSidebarCollapsed ? "Expand right sidebar" : "Collapse right sidebar"}
+        >
+          {rightSidebarCollapsed ? <FaChevronLeft /> : <FaChevronRight />}
+        </button>
+        
+        <div className="sidebar-header">
+          <h2 className="sidebar-title">Camera Position</h2>
+        </div>
+
+        <div className="sidebar-content">
+          <CameraSliders
+            cameraPosition={cameraPos}
+            onPositionChange={handleSliderChange}
+            disabled={isLoading}
+          />
+
+          <CameraPositionPresets
+            currentPosition={cameraPos}
+            onPresetSelect={handlePresetSelect}
+            disabled={isLoading}
+          />
+
+          <CameraControls
+            onResetCamera={handleResetCamera}
+            onResetZoom={handleResetZoom}
+            disabled={isLoading}
+          />
+        </div>
+      </aside>
+
+      <main className={`app-main ${sidebarCollapsed ? 'sidebar-collapsed' : ''} ${rightSidebarCollapsed ? 'right-sidebar-collapsed' : ''} ${mode === 'video' ? 'video-mode' : ''}`}>
         {isLoading && <LoadingState message="Loading phone model..." />}
         <PhoneViewer mountRef={mountRef} />
         
