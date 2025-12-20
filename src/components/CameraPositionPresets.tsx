@@ -292,10 +292,31 @@ export const CameraPositionPresets: React.FC<CameraPositionPresetsProps> = ({
         <div className="camera-presets-grid">
           {CAMERA_PRESETS.map((preset, index) => {
             const isActive = isPresetActive(preset);
-            // Every 5th button (rightmost column) uses left tooltip
-            const isRightmost = index % 5 === 4;
-            const tooltipClass = isRightmost ? 'tooltip-trigger-left-compact' : 'tooltip-trigger-top-compact';
-            const tooltipSpanClass = isRightmost ? 'tooltip-left-compact' : 'tooltip-top-compact';
+            // Determine tooltip position based on grid position
+            const row = Math.floor(index / 5);
+            const col = index % 5;
+            const isLeftmost = col === 0; // Column 1 (leftmost)
+            const isRightmost = col === 4; // Column 5 (rightmost)
+            const isTopRowMiddle = row === 0 && col >= 1 && col <= 3; // Top row, columns 2-4
+            
+            // Column 1 (leftmost): tooltip to the right
+            // Column 5 (rightmost): tooltip to the left
+            // Top row, columns 2-4: tooltip at bottom
+            // Everything else: tooltip at top
+            let tooltipClass, tooltipSpanClass;
+            if (isLeftmost) {
+              tooltipClass = 'tooltip-trigger-right-compact';
+              tooltipSpanClass = 'tooltip-right-compact';
+            } else if (isRightmost) {
+              tooltipClass = 'tooltip-trigger-left-compact';
+              tooltipSpanClass = 'tooltip-left-compact';
+            } else if (isTopRowMiddle) {
+              tooltipClass = 'tooltip-trigger-bottom-compact';
+              tooltipSpanClass = 'tooltip-bottom-compact';
+            } else {
+              tooltipClass = 'tooltip-trigger-top-compact';
+              tooltipSpanClass = 'tooltip-top-compact';
+            }
             
             const iconSources = ICON_MAP[preset.id];
             
